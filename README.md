@@ -14,38 +14,31 @@ This platform streamlines the recruitment process by automating the first round 
 
 ### 🏢 For HR & Admins
 
-* 
-**Bulk Candidate Onboarding:** Invite hundreds of candidates instantly via CSV upload (Email, Name, Job Role).
+* **Bulk Candidate Onboarding:** Invite hundreds of candidates instantly via CSV upload (Email, Name, Job Role).
 
 
-* 
-**AI-Driven Dashboards:** View automated summaries, technical scores (1-10), and behavioral keywords for every applicant.
+* **AI-Driven Dashboards:** View automated summaries, technical scores (1-10), and behavioral keywords for every applicant.
 
 
-* 
-**Secure Playback:** Listen to candidate audio responses via secure, time-limited signed URLs.
+* **Secure Playback:** Listen to candidate audio responses via secure, time-limited signed URLs.
 
 
 
 ### 🎤 For Candidates
 
-* 
-**Seamless Interface:** A clean, step-by-step interview wizard with audio system checks.
+* **Seamless Interface:** A clean, step-by-step interview wizard with audio system checks.
 
 
-* 
-**Voice-First Assessment:** Answer questions naturally using voice recording.
+* **Voice-First Assessment:** Answer questions naturally using voice recording.
 
 
 
 ### 🛡️ Security & Integrity
 
-* 
-**Anti-Cheating Mechanisms:** Monitors tab switching and enforces full-screen mode during interviews.
+* **Anti-Cheating Mechanisms:** Monitors tab switching and enforces full-screen mode during interviews.
 
 
-* 
-**Role-Based Access Control:** Strict data isolation ensures Candidates only see their session, and HR only sees assigned data.
+* **Role-Based Access Control:** Strict data isolation ensures Candidates only see their session, and HR only sees assigned data.
 
 
 
@@ -53,7 +46,7 @@ This platform streamlines the recruitment process by automating the first round 
 
 ## 🛠️ Technical Architecture
 
-Core Stack 
+### Core Stack 
 
 * **Frontend:** React.js + Tailwind CSS (Glassmorphism UI).
 * **Backend:** Node.js + Express.js.
@@ -63,18 +56,9 @@ Core Stack
 ### AI & Cloud Pipeline
 
 1. **Audio Capture:** Frontend records audio blobs.
-2. 
-**Storage:** Audio is uploaded to **Cloudinary**.
-
-
-3. 
-**Processing:** The backend fetches the file, converts it to Base64, and sends it to **Gemini 2.5 Flash** with a structured system prompt.
-
-
-4. 
-**Analysis:** Gemini returns a JSON object containing the transcript summary, score, and keywords.
-
-
+2. **Storage:** Audio is uploaded to **Cloudinary**.
+3. **Processing:** The backend fetches the file, converts it to Base64, and sends it to **Gemini 2.5 Flash** with a structured system prompt.
+4. **Analysis:** Gemini returns a JSON object containing the transcript summary, score, and keywords.
 
 ---
 
@@ -90,8 +74,8 @@ Core Stack
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/ai-interview-platform.git
-cd ai-interview-platform
+git clone https://github.com/PUSKAR-DJ/ai-interview.git
+cd ai-interview
 
 ```
 
@@ -140,9 +124,10 @@ npm run dev
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/   # Logic for Auth, Admin, Candidate, HR
-[cite_start]│   │   ├── models/        # Mongoose Schemas (User, Job, Candidate) [cite: 44]
+│   │   ├── models/        # Mongoose Schemas 
 │   │   ├── services/      # Gemini AI & Cloudinary Services
 │   │   └── routes/        # API Endpoints
+|
 ├── frontend/
 │   ├── src/
 │   │   ├── components/    # Reusable UI (Recorders, Tables)
@@ -157,20 +142,12 @@ npm run dev
 We utilize a specific prompt structure to ensure consistent JSON output from Gemini:
 
 > "You are an expert technical interviewer. Listen to the attached audio response... Output a JSON object containing: transcript_summary, technical_accuracy (1-10), communication_style, and keywords_detected." 
-> 
-> 
 
 ---
 
 ## 👥 Contributors
 
-* **Dev 1:** Backend Architecture & Auth
-* **Dev 2:** AI Pipeline & Cloud Integration
-* **Dev 3:** Candidate Experience (Frontend)
-* **Dev 4:** Dashboards & Data Visualization
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
+* [Raj Sharma](https://github.com/rajsha10)
+* [Subhadip Mandal](https://github.com/Subhadip1001)
+* [Pronay Sarkar](https://github.com/PronaySarkar)
+* [Puskar Saha](https://github.com/PUSKAR-DJ)
