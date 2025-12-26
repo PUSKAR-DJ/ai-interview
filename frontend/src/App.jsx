@@ -1,15 +1,6 @@
-// import { useState } from 'react'
-import './App.css'
-import Login from './pages/Login.jsx'
-import AdminDashboard from './pages/AdminDashboard.jsx'
+import AppRoutes from "./routes/AppRoutes";
+import "./styles/globals.css";
 
-function App() {
-  return (
-    <>
-      {/* <Login /> */}
-      {/* <AdminDashboard /> */}
-    </>
-  )
+export default function App() {
+  return <AppRoutes />;
 }
-
-export default App

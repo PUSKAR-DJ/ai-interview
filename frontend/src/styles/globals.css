@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  @apply bg-bg text-text antialiased;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+::selection {
+  background: #E0E7FF;
+}
