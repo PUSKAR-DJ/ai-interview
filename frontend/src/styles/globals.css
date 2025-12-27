@@ -10,3 +10,11 @@ html, body {
 ::selection {
   background: #E0E7FF;
 }
+
+.focus-bg {
+  background: radial-gradient(
+    circle at top,
+    rgba(99, 102, 241, 0.08),
+    transparent 60%
+  );
+}
