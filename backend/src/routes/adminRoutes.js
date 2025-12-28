@@ -1,13 +1,34 @@
 import express from "express";
-import { createJob, bulkUploadCandidates } from "../controllers/adminController.js";
-import { upload } from "../middlewares/uploadMiddleware.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import { isAdmin } from "../middlewares/roleMiddleware.js";
+import { 
+  getAdminOverview, 
+  createDepartment, 
+  getAllDepartments, 
+  deleteDepartment, 
+  createUser, 
+  deleteUser, 
+  getUsers 
+} from "../controllers/adminController.js";
+import { getCandidateInterview } from "../controllers/adminController.js";
 
 const router = express.Router();
 
-// Create a new job role
-router.post("/jobs", createJob);
+// Protect all routes
+router.use(authMiddleware, isAdmin);
 
-// Upload candidates via CSV
-router.post("/upload-candidates", upload.single("file"), bulkUploadCandidates);
+router.get("/overview", getAdminOverview);
+
+// Department Routes
+router.get("/departments", getAllDepartments);
+router.post("/departments", createDepartment);
+router.delete("/departments/:id", deleteDepartment);
+
+// User Routes
+router.get("/users", getUsers);
+router.post("/users", createUser);
+router.delete("/users/:id", deleteUser);
+
+router.get("/interviews/:id", getCandidateInterview); // :id is the candidate's User ID
 
 export default router;
