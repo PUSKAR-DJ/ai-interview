@@ -1,6 +1,7 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
 import Sidebar from "../components/sidebar/Sidebar";
 import TopBar from "../components/topbar/TopBar";
+import { useAuth } from "../../hooks/useAuth"; // Import the hook
 
 function getTitle(pathname) {
   if (pathname.includes("interviews")) return "Interviews";
@@ -11,9 +12,21 @@ function getTitle(pathname) {
 }
 
 export default function AppLayout() {
+  const { user, loading } = useAuth(); // Get auth state
   const location = useLocation();
   const isFocusMode = location.pathname.startsWith("/app/interviews/");
   const title = getTitle(location.pathname);
+
+  // 1. Show loading spinner while checking auth
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  // 2. Security Check: If not logged in, redirect to login immediately
+  // This prevents the Sidebar from rendering with a null user
+  if (!user) {
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
+  }
 
   return (
     <div className="min-h-screen bg-bg">

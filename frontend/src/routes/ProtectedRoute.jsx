@@ -1,10 +1,9 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 // allowedRoles: Array of roles allowed to access this route (e.g., ['admin', 'hr'])
 export default function ProtectedRoute({ children, allowedRoles }) {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) return <div className="p-10 text-center">Loading...</div>;

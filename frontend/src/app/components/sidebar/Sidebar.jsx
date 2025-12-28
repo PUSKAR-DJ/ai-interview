@@ -1,39 +1,72 @@
 import { NavLink } from "react-router-dom";
-
-const navItems = [
-  { label: "Dashboard", to: "/app" },
-  { label: "Interviews", to: "/app/interviews" },
-  { label: "Candidates", to: "/app/candidates" },
-  { label: "Reports", to: "/app/reports" },
-  { label: "Settings", to: "/app/settings" },
-];
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function Sidebar() {
-  return (
-    <aside className="hidden md:flex w-64 flex-col border-r border-black/5 bg-white">
-      <div className="h-16 flex items-center px-6 font-semibold">
-        Company
-      </div>
+  const { user } = useAuth();
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map((item) => (
+  const navItems = [
+    // Shared (Admin & HR)
+    { 
+      label: "Dashboard", 
+      path: "/app/dashboard", 
+      roles: ["admin", "hr"],
+      icon: "📊" 
+    },
+    { 
+      label: "Candidates", 
+      path: "/app/candidates", 
+      roles: ["admin", "hr"],
+      icon: "users" 
+    },
+    // Admin Only
+    { 
+      label: "Departments", 
+      path: "/app/admin/departments", 
+      roles: ["admin"],
+      icon: "building" 
+    },
+    // Student Only
+    {
+      label: "Interview",
+      path: "/app/interview",
+      roles: ["student"],
+      icon: "video"
+    },
+    {
+      label: "Result",
+      path: "/app/result",
+      roles: ["student"],
+      icon: "award"
+    }
+  ];
+
+  // Filter items based on user role
+  const filteredItems = navItems.filter(item => item.roles.includes(user?.role));
+
+  return (
+    <aside className="w-64 bg-slate-900 text-white flex-shrink-0 hidden md:flex flex-col">
+      <div className="p-6 font-bold text-xl tracking-wider">AI INTERVIEW</div>
+      <nav className="flex-1 px-4 space-y-2">
+        {filteredItems.map((item) => (
           <NavLink
-            key={item.to}
-            to={item.to}
-            end
+            key={item.path}
+            to={item.path}
             className={({ isActive }) =>
-              `block rounded-lg px-3 py-2 text-sm transition
-               ${
-                 isActive
-                   ? "bg-accentSoft text-accent font-medium"
-                   : "text-muted hover:bg-black/5"
-               }`
+              `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                isActive ? "bg-blue-600 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"
+              }`
             }
           >
-            {item.label}
+            <span>{item.icon}</span>
+            <span>{item.label}</span>
           </NavLink>
         ))}
       </nav>
+      {/* User Mini Profile */}
+      <div className="p-4 bg-slate-800">
+        <p className="text-sm font-medium text-white">{user?.name}</p>
+        <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
+      </div>
     </aside>
   );
 }
