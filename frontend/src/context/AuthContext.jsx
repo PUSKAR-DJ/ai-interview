@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import api from "../api/axios";
+import { createContext, useState, useEffect } from "react";
+import { getProfile, loginUser, logoutUser } from "../api/auth.api";
 
 const AuthContext = createContext(null);
 
@@ -8,16 +8,35 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get("/auth/me")
-      .then((res) => setUser(res.data))
-      .finally(() => setLoading(false));
+    checkAuth();
   }, []);
 
+  const checkAuth = async () => {
+    try {
+      const data = await getProfile();
+      setUser(data.user);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (credentials) => {
+    await loginUser(credentials);
+    await checkAuth();
+  };
+
+  const logout = async () => {
+    await logoutUser();
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export { AuthContext };

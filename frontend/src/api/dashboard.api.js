@@ -1,4 +1,13 @@
 import api from "./axios";
 
-export const getDashboardStats = () =>
-  api.get("/dashboard/stats");
+// Backend: GET /api/admin/overview
+export const getAdminStats = async () => {
+  const response = await api.get("/admin/overview");
+  return response.data;
+};
+
+// Backend: GET /api/hr/overview
+export const getHRStats = async () => {
+  const response = await api.get("/hr/overview");
+  return response.data;
+};

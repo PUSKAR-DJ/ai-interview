@@ -1,29 +1,82 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Landing from "../marketing/pages/Landing";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+
+// Layouts
 import AppLayout from "../app/layouts/AppLayout";
+
+// Pages
+import Login from "../marketing/pages/Login"; // Assuming you have this
 import Dashboard from "../app/pages/dashboard/Dashboard";
-import InterviewsList from "../app/pages/interviews/InterviewsList";
-import Candidates from "../app/pages/candidates/Candidates";
-import Settings from "../app/pages/settings/Settings";
 import InterviewSession from "../app/pages/interviews/InterviewSession";
-import InterviewSummary from "../app/pages/interviews/InterviewSummary";
+import InterviewResult from "../app/pages/interviews/InterviewSummary"; // Or Result page
+import Candidates from "../app/pages/candidates/Candidates";
 
 export default function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Marketing */}
-                <Route path="/" element={<Landing />} />
+                {/* Public Routes */}
+                <Route path="/auth/login" element={<Login />} />
+                <Route path="/" element={<Navigate to="/auth/login" />} />
 
-                {/* App */}
-                <Route element={<AppLayout />}>
-                    <Route path="/app" element={<Dashboard />} />
-                    <Route path="/app/interviews" element={<InterviewsList />} />
-                    <Route path="/app/candidates" element={<Candidates />} />
-                    <Route path="/app/settings" element={<Settings />} />
-                    <Route path="/app/interviews/session" element={<InterviewSession />} />
-                    <Route path="/app/interviews/:id/summary" element={<InterviewSummary />} />
+                {/* Protected App Routes */}
+                <Route path="/app" element={<AppLayout />}>
+                    
+                    {/* ADMIN & HR DASHBOARDS */}
+                    <Route 
+                        path="dashboard" 
+                        element={
+                            <ProtectedRoute allowedRoles={["admin", "hr"]}>
+                                <Dashboard />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    {/* ADMIN ONLY */}
+                    <Route 
+                        path="admin/*" 
+                        element={
+                            <ProtectedRoute allowedRoles={["admin"]}>
+                                {/* Add Admin specific routes here if needed */}
+                                <div>Admin Settings Panel</div>
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    {/* HR & ADMIN: CANDIDATES */}
+                    <Route 
+                        path="candidates" 
+                        element={
+                            <ProtectedRoute allowedRoles={["hr", "admin"]}>
+                                <Candidates />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    {/* STUDENT: INTERVIEW SESSION */}
+                    <Route 
+                        path="interview" 
+                        element={
+                            <ProtectedRoute allowedRoles={["student"]}>
+                                <InterviewSession />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    {/* STUDENT: RESULT PAGE */}
+                    <Route 
+                        path="result" 
+                        element={
+                            <ProtectedRoute allowedRoles={["student"]}>
+                                <InterviewResult />
+                            </ProtectedRoute>
+                        } 
+                    />
+
                 </Route>
+
+                {/* Catch all */}
+                <Route path="*" element={<Navigate to="/auth/login" />} />
             </Routes>
         </BrowserRouter>
     );
