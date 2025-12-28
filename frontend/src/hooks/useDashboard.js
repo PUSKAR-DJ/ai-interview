@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { getAdminStats, getHRStats } from "../api/dashboard.api";
 
 export default function useDashboard() {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

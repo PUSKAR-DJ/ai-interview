@@ -5,6 +5,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "../app/layouts/AppLayout";
 
 // Pages
+import Landing from "../marketing/pages/Landing";
 import Login from "../marketing/pages/Login"; // Assuming you have this
 import Dashboard from "../app/pages/dashboard/Dashboard";
 import InterviewSession from "../app/pages/interviews/InterviewSession";
@@ -16,8 +17,8 @@ export default function AppRoutes() {
         <BrowserRouter>
             <Routes>
                 {/* Public Routes */}
+                <Route path="/" element={<Landing />} />
                 <Route path="/auth/login" element={<Login />} />
-                <Route path="/" element={<Navigate to="/auth/login" />} />
 
                 {/* Protected App Routes */}
                 <Route path="/app" element={<AppLayout />}>
