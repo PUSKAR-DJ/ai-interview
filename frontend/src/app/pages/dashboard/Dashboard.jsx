@@ -1,13 +1,13 @@
-import { motion } from "framer-motion";
-import { pageTransition } from "../../../shared/motion/animations";
+import useDashboard from "../../../hooks/useDashboard";
 import StatsGrid from "../../components/dashboard/StatsGrid";
-import ActivityList from "../../components/dashboard/ActivityList";
 
 export default function Dashboard() {
+  const { data, loading } = useDashboard();
+
+  if (loading) return <div>Loading...</div>;
+  if (!data) return null;
+
   return (
-    <motion.div {...pageTransition} className="space-y-10">
-      <StatsGrid />
-      <ActivityList />
-    </motion.div>
+    <StatsGrid stats={data} />
   );
 }

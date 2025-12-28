@@ -21,7 +21,7 @@ export default function AppRoutes() {
                     <Route path="/app/interviews" element={<InterviewsList />} />
                     <Route path="/app/candidates" element={<Candidates />} />
                     <Route path="/app/settings" element={<Settings />} />
-                    <Route path="/app/interviews/:id" element={<InterviewSession />} />
+                    <Route path="/app/interviews/session" element={<InterviewSession />} />
                     <Route path="/app/interviews/:id/summary" element={<InterviewSummary />} />
                 </Route>
             </Routes>

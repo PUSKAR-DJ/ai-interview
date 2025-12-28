@@ -1,13 +1,18 @@
 import InterviewHeader from "../../components/interview/InterviewHeader";
 import QuestionPanel from "../../components/interview/QuestionPanel";
-import InterviewControls from "../../components/interview/InterviewControls";
+import ProgressIndicator from "../../components/interview/ProgressIndicator";
+import ControlBar from "../../components/interview/ControlBar";
 
 export default function InterviewSession() {
   return (
-    <div className="w-full max-w-4xl flex flex-col items-center gap-8 py-12">
+    <div className="max-w-4xl mx-auto space-y-8">
       <InterviewHeader />
+
       <QuestionPanel />
-      <InterviewControls />
+
+      <ProgressIndicator current={3} total={10} />
+
+      <ControlBar />
     </div>
   );
 }
