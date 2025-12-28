@@ -1,40 +1,37 @@
-import useDashboard from "../../../hooks/useDashboard"; // We created this earlier
+import useDashboard from "../../../hooks/useDashboard";
 import { useAuth } from "../../../hooks/useAuth";
 import StatsGrid from "../../components/dashboard/StatsGrid";
-import ActivityList from "../../components/dashboard/ActivityList";
+// import ActivityList from "../../components/dashboard/ActivityList"; // Uncomment if you implement this later
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { data, loading, error } = useDashboard();
 
-  if (loading) return <div className="p-8">Loading stats...</div>;
+  if (loading) return <div className="p-8 text-slate-500">Loading live stats...</div>;
   if (error) return <div className="p-8 text-red-500">Failed to load dashboard data.</div>;
 
   return (
-    <div className="space-y-6">
-      {/* Header Section */}
+    <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">
-          {user.role === "admin" ? "Global Overview" : `${user.departmentId?.name || 'Department'} Overview`}
+          {user.role === "admin" ? "System Overview" : "Department Dashboard"}
         </h1>
-        <p className="text-slate-500">
+        <p className="text-slate-500 mt-1">
           {user.role === "admin" 
-            ? "System-wide metrics and activities" 
-            : "Track candidates and interviews for your department"}
+            ? "Manage your organization's recruitment pipeline" 
+            : `Track candidates in ${user.departmentId?.name || "your department"}`}
         </p>
       </div>
 
-      {/* Stats Grid - Automatically adapts because 'data' structure matches keys */}
-      {/* Admin sees: totalCandidates, totalHRs, totalDepts */}
-      {/* HR sees: totalDeptCandidates, pendingInterviews, completedInterviews */}
+      {/* Pass real data to grid */}
       <StatsGrid stats={data} role={user.role} />
 
-      {/* Recent Activity / Charts could go here */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-           <h3 className="font-semibold mb-4">Recent Actions</h3>
-           <ActivityList role={user.role} /> 
-        </div>
+      {/* Placeholder for future Charts/Activity */}
+      <div className="p-6 bg-white rounded-xl border border-slate-100 shadow-sm">
+        <h3 className="font-semibold text-slate-800 mb-4">Quick Actions</h3>
+        <p className="text-slate-500 text-sm">
+          Navigate to the <strong>Candidates</strong> tab to manage new applicants or view interview results.
+        </p>
       </div>
     </div>
   );

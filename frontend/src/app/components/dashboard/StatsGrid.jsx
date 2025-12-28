@@ -1,22 +1,33 @@
-import StatCard from "./StatCard";
+import StatCard from "./StatCard"; // Assuming you have a basic Card component here
 
-const stats = [
-  { label: "Total Interviews", value: "128" },
-  { label: "Pending Interviews", value: "12" },
-  { label: "Completed Today", value: "5" },
-  { label: "Candidates", value: "86" },
-];
+export default function StatsGrid({ stats, role }) {
+  // Define mappings based on Role
+  const adminStats = [
+    { label: "Total Candidates", value: stats?.totalCandidates || 0, icon: "👥", color: "blue" },
+    { label: "Total HRs", value: stats?.totalHRs || 0, icon: "👔", color: "purple" },
+    { label: "Departments", value: stats?.totalDepts || 0, icon: "🏢", color: "orange" },
+    { label: "Completed Interviews", value: stats?.completedInterviews || 0, icon: "✅", color: "green" },
+  ];
 
-export default function StatsGrid() {
+  const hrStats = [
+    { label: "Dept. Candidates", value: stats?.totalDeptCandidates || 0, icon: "👥", color: "blue" },
+    { label: "Pending Interviews", value: stats?.pendingInterviews || 0, icon: "⏳", color: "orange" },
+    { label: "Completed Interviews", value: stats?.completedInterviews || 0, icon: "✅", color: "green" },
+  ];
+
+  const items = role === "admin" ? adminStats : hrStats;
+
   return (
-    <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat) => (
-        <StatCard
-          key={stat.label}
-          label={stat.label}
-          value={stat.value}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {items.map((item, index) => (
+        <StatCard 
+          key={index}
+          title={item.label}
+          value={item.value}
+          icon={item.icon}
+          color={item.color}
         />
       ))}
-    </section>
+    </div>
   );
 }

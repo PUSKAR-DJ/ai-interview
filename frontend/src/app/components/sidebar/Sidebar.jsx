@@ -1,8 +1,14 @@
-import { NavLink } from "react-router-dom";
-import { useAuth } from "../../../hooks/useAuth";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../hooks/useAuth"; 
 
 export default function Sidebar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth/login");
+  };
 
   const navItems = [
     // Shared (Admin & HR)
@@ -16,27 +22,27 @@ export default function Sidebar() {
       label: "Candidates", 
       path: "/app/candidates", 
       roles: ["admin", "hr"],
-      icon: "users" 
+      icon: "👥" 
     },
     // Admin Only
     { 
       label: "Departments", 
       path: "/app/admin/departments", 
       roles: ["admin"],
-      icon: "building" 
+      icon: "🏢" 
     },
     // Student Only
     {
       label: "Interview",
       path: "/app/interview",
       roles: ["student"],
-      icon: "video"
+      icon: "🎥"
     },
     {
       label: "Result",
       path: "/app/result",
       roles: ["student"],
-      icon: "award"
+      icon: "🏆"
     }
   ];
 
@@ -45,8 +51,13 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 bg-slate-900 text-white flex-shrink-0 hidden md:flex flex-col">
-      <div className="p-6 font-bold text-xl tracking-wider">AI INTERVIEW</div>
-      <nav className="flex-1 px-4 space-y-2">
+      {/* Brand */}
+      <div className="p-6 font-bold text-xl tracking-wider flex items-center gap-2">
+        <span className="text-blue-500">AI</span> INTERVIEW
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
         {filteredItems.map((item) => (
           <NavLink
             key={item.path}
@@ -62,10 +73,27 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      {/* User Mini Profile */}
-      <div className="p-4 bg-slate-800">
-        <p className="text-sm font-medium text-white">{user?.name}</p>
-        <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
+
+      {/* User Profile & Logout */}
+      <div className="p-4 border-t border-slate-800 bg-slate-900/50">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-sm font-medium text-white truncate max-w-[120px]" title={user?.name}>
+              {user?.name}
+            </p>
+            <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+          </div>
+          <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">
+            {user?.name?.charAt(0).toUpperCase()}
+          </div>
+        </div>
+        
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-400 bg-red-400/10 hover:bg-red-400/20 rounded-lg transition-colors"
+        >
+          <span>🚪</span> Sign Out
+        </button>
       </div>
     </aside>
   );

@@ -49,11 +49,11 @@ export const deleteDepartment = async (req, res) => {
 // --- User Management (HR & Students) ---
 export const createUser = async (req, res) => {
   try {
-    const {RP, email, password, role, departmentId } = req.body;
+    const {name, email, password, role, departmentId } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     
     const user = await User.create({
-      name: RP, // or req.body.name
+      name,
       email,
       password: hashedPassword,
       role,

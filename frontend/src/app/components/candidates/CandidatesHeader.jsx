@@ -1,6 +1,7 @@
 import { Button } from "../../../shared/ui";
 
-export default function CandidatesHeader() {
+// Accept onAdd prop
+export default function CandidatesHeader({ onAdd }) {
   return (
     <div className="flex items-center justify-between">
       <div>
@@ -10,7 +11,8 @@ export default function CandidatesHeader() {
         </p>
       </div>
 
-      <Button>
+      {/* Attach onClick handler */}
+      <Button onClick={onAdd}>
         Add candidate
       </Button>
     </div>

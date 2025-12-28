@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "./useAuth";
+import { useState, useEffect } from "react";
+import { useAuth } from "./useAuth"; // Ensure this path is correct for your project
 import { getAdminStats, getHRStats } from "../api/dashboard.api";
 
 export default function useDashboard() {
@@ -9,16 +9,16 @@ export default function useDashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchStats = async () => {
       try {
         setLoading(true);
         let stats = null;
 
         if (user.role === "admin") {
+          // Backend returns: { totalCandidates, totalHRs, totalDepts, completedInterviews }
           stats = await getAdminStats();
         } else if (user.role === "hr") {
+          // Backend returns: { totalDeptCandidates, pendingInterviews, completedInterviews }
           stats = await getHRStats();
         }
         
@@ -31,7 +31,7 @@ export default function useDashboard() {
       }
     };
 
-    fetchStats();
+    if (user) fetchStats();
   }, [user]);
 
   return { data, loading, error };
