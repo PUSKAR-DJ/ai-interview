@@ -30,12 +30,10 @@ export default function InterviewResult() {
   }, []);
 
   const fetchResult = () => {
-    console.log("Fetching result...");
     setLoading(true);
     setError(null);
     getMyResult()
       .then((res) => {
-        console.log("Result received:", res.data);
         setResult(res.data);
       })
       .catch((err) => {
