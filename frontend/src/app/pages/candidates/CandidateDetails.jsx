@@ -91,23 +91,23 @@ export default function CandidateDetails() {
 
             {/* Header Card */}
             <motion.div variants={itemVariants}>
-                <GlassPanel className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div className="flex items-start gap-4">
-                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl font-bold">
+                <GlassPanel className="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold flex-shrink-0">
                             {candidateName.charAt(0)}
                         </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-800">{candidateName}</h1>
-                            <div className="flex items-center gap-4 text-slate-500 mt-1 text-sm">
-                                <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {candidateEmail}</span>
+                        <div className="min-w-0">
+                            <h1 className="text-xl md:text-2xl font-bold text-slate-800 truncate">{candidateName}</h1>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-slate-500 mt-0.5 text-xs md:text-sm">
+                                <span className="flex items-center gap-1 truncate"><Mail className="w-3 h-3 flex-shrink-0" /> {candidateEmail}</span>
                                 {data.endTime && (
-                                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(data.endTime).toLocaleDateString()}</span>
+                                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3 flex-shrink-0" /> {new Date(data.endTime).toLocaleDateString()}</span>
                                 )}
                             </div>
                         </div>
                     </div>
 
-                    <div className={`px-4 py-2 rounded-full text-sm font-semibold border ${data.status === 'Completed' || data.status === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-100' :
+                    <div className={`px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold border self-start md:self-auto uppercase tracking-wide ${data.status === 'Completed' || data.status === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-100' :
                         data.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-700 border-blue-100' :
                             'bg-slate-50 text-slate-700 border-slate-100'
                         }`}>

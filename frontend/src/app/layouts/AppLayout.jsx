@@ -62,16 +62,18 @@ export default function AppLayout() {
               onMenuClick={() => setMobileMenuOpen(true)}
               user={user}
             />
-            <main className="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={location.pathname}
-                  {...pageTransition}
-                  className="h-full"
-                >
-                  <Outlet />
-                </motion.div>
-              </AnimatePresence>
+            <main className="flex-1 overflow-y-auto scroll-smooth">
+              <div className="aligned-container py-6 md:py-8 h-full">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={location.pathname}
+                    {...pageTransition}
+                    className="h-full"
+                  >
+                    <Outlet />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </main>
           </div>
         </div>

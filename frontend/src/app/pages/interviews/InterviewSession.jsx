@@ -170,64 +170,72 @@ export default function InterviewSession() {
   }
 
   return (
-    <div className="h-[calc(100vh-6rem)] flex flex-col bg-slate-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-slate-900/5">
+    <div className="flex flex-col bg-slate-900 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-slate-900/5 h-[calc(100vh-8rem)] md:h-[calc(100vh-6rem)]">
       {/* Header */}
-      <header className="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center shrink-0">
-        <h1 className="font-bold text-xl text-white">AI Interview Session</h1>
-        <div className="flex items-center space-x-4">
+      <header className="p-4 bg-slate-800/50 backdrop-blur-md border-b border-white/5 flex justify-between items-center shrink-0">
+        <div className="flex flex-col">
+          <h1 className="font-bold text-lg md:text-xl text-white">AI Interview</h1>
+          <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">{deptName || "Standard Division"}</span>
+        </div>
+        <div className="flex items-center space-x-2 md:space-x-4">
           {isRecording && (
-            <div className="flex items-center text-red-400 animate-pulse font-mono">
-              <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-              REQ {formatTime(recordingTime)}
+            <div className="flex items-center text-red-400 animate-pulse font-mono text-sm">
+              <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+              {formatTime(recordingTime)}
             </div>
           )}
           {isRecording && (
-            <button onClick={endInterview} className="bg-red-600/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-colors border border-red-500/30 text-sm font-medium">
-              End Interview
+            <button onClick={endInterview} className="bg-red-600/10 text-red-400 px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-red-600 hover:text-white transition-all border border-red-500/20 text-xs md:text-sm font-bold uppercase tracking-wide">
+              Finish
             </button>
           )}
         </div>
       </header>
 
       {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-900">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-slate-900 scroll-smooth">
         {!isRecording && recordingTime === 0 && (
           <div className="h-full flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 bg-blue-600/20 rounded-full flex items-center justify-center mb-6 text-blue-400">
+            <div className="w-20 h-20 bg-blue-600/10 rounded-full flex items-center justify-center mb-6 text-blue-500 ring-4 ring-blue-600/5">
               <Mic size={40} />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-4">Ready to Start?</h2>
-            <div className="space-y-2 text-slate-400 max-w-md mx-auto mb-8">
-              <p>• Ensure you are in a quiet environment.</p>
-              <p>• Speak clearly into your microphone.</p>
-              <p>• Takes approx. 5-10 minutes.</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Start Your Interview</h2>
+            <div className="space-y-3 text-slate-400 max-w-sm mx-auto mb-8 text-sm md:text-base">
+              <p className="flex items-center gap-2 justify-center"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Finding a quiet spot recommended</p>
+              <p className="flex items-center gap-2 justify-center"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Speak naturally and clearly</p>
+              <p className="flex items-center gap-2 justify-center"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Best results with headphones</p>
             </div>
 
-            <button onClick={startInterview} className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg shadow-blue-600/30 transition-transform hover:scale-105 flex items-center gap-2">
-              <Mic size={20} /> Start Interview
+            <button onClick={startInterview} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-xl shadow-blue-900/40 transition-all hover:scale-105 flex items-center gap-3">
+              <Mic size={22} /> Start Now
             </button>
           </div>
         )}
 
         {messages.map((msg, idx) => (
-          <div key={idx} className={`flex ${msg.role === 'assistant' ? 'justify-start' : 'justify-end'}`}>
-            <div className={`max-w-[80%] p-4 rounded-2xl text-lg leading-relaxed shadow-sm ${msg.role === 'assistant'
-              ? 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700'
-              : 'bg-blue-600 text-white rounded-tr-none'
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            key={idx}
+            className={`flex ${msg.role === 'assistant' ? 'justify-start' : 'justify-end'}`}
+          >
+            <div className={`max-w-[85%] md:max-w-[75%] p-4 md:p-5 rounded-2xl text-base md:text-lg leading-relaxed shadow-lg ${msg.role === 'assistant'
+              ? 'bg-slate-800/80 text-slate-100 rounded-tl-none border border-white/5'
+              : 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-tr-none shadow-blue-900/30'
               }`}>
               {msg.text}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Footer Controls */}
       {isRecording && (
-        <div className="p-4 bg-slate-800 border-t border-slate-700 shrink-0">
-          <div className="max-w-3xl mx-auto flex items-center gap-4">
-            <div className="flex-1 bg-slate-900 rounded-full px-6 py-4 text-slate-500 flex items-center justify-between border border-slate-700">
-              <span>Listening... (Speak your answer clearly)</span>
-              <div className="flex gap-1">
+        <div className="p-4 bg-slate-800/50 backdrop-blur-md border-t border-white/5 shrink-0">
+          <div className="max-w-3xl mx-auto flex items-center gap-3 md:gap-4">
+            <div className="flex-1 bg-slate-900/80 rounded-full px-4 md:px-6 py-3 md:py-4 text-slate-400 flex items-center justify-between border border-white/5 shadow-inner">
+              <span className="text-xs md:text-sm truncate mr-2">I am listening to your response...</span>
+              <div className="flex gap-1 flex-shrink-0">
                 <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                 <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                 <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
@@ -237,17 +245,17 @@ export default function InterviewSession() {
             <button
               onClick={() => {
                 if (currentQuestionIndex < questions.length) {
-                  setMessages(prev => [...prev, { role: 'user', text: "(Answer Recorded)" }]);
+                  setMessages(prev => [...prev, { role: 'user', text: "(Response Recorded)" }]);
                   setTimeout(() => {
                     setMessages(prev => [...prev, { role: 'assistant', text: questions[currentQuestionIndex] }]);
                     setCurrentQuestionIndex(prev => prev + 1);
-                  }, 8000); // Artificial delay to simulate thinking/listening
+                  }, 2000); // Reduced artificial delay for better snappy feel
                 } else {
-                  setMessages(prev => [...prev, { role: 'assistant', text: "Thank you. That was the last question. You may end the interview now." }]);
+                  setMessages(prev => [...prev, { role: 'assistant', text: "Excellent. I have all the information I need. Please click 'Finish' to submit your interview." }]);
                 }
               }}
-              className="bg-blue-600 p-4 rounded-full hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/50"
-              title="Submit Answer"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 md:p-5 rounded-full hover:from-blue-500 hover:to-indigo-500 transition-all shadow-xl shadow-blue-900/50 flex-shrink-0 active:scale-95"
+              title="End Answer & Next Question"
             >
               <Send size={24} className="text-white" />
             </button>

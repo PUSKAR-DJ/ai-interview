@@ -40,8 +40,8 @@ export default function EditUserModal({ user, onClose, onSave, departments, isHR
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <GlassPanel className="w-full max-w-md p-6 bg-white shadow-2xl">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+            <GlassPanel className="w-full sm:max-w-md p-6 bg-white shadow-2xl rounded-t-3xl sm:rounded-xl animate-in slide-in-from-bottom sm:slide-in-from-none duration-300">
                 <h2 className="text-xl font-bold text-slate-800 mb-4">Edit User</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>

@@ -5,7 +5,7 @@ export default function GlassPanel({ children, className = "", hoverEffect = fal
   return (
     <motion.div
       {...(hoverEffect ? hoverLift : {})}
-      className={`rounded-xl border border-black/5 bg-white/70 backdrop-blur-glass shadow-glass ${className}`}
+      className={`rounded-xl border border-white/20 bg-white/70 backdrop-blur-glass shadow-glass overflow-hidden ${className}`}
       {...props}
     >
       {children}
