@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { getDepartments, createDepartment, deleteDepartment } from "../../../api/admin.api";
 import Button from "../../../shared/ui/Button";
 import Card from "../../../shared/ui/Card";
+
+// Variants
+const container = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
 
 export default function Departments() {
   const [departments, setDepartments] = useState([]);
@@ -47,31 +59,43 @@ export default function Departments() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800">Manage Departments</h1>
-      
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="visible"
+      className="space-y-6"
+    >
+      <motion.h1 variants={item} className="text-2xl font-bold text-slate-800">Manage Departments</motion.h1>
+
       {/* Add Department Form */}
-      <Card className="p-6">
-        <form onSubmit={handleAdd} className="flex gap-4 items-end">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-700 mb-1">New Department Name</label>
-            <input
-              type="text"
-              className="w-full p-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Engineering, Sales, HR..."
-              value={newDept}
-              onChange={(e) => setNewDept(e.target.value)}
-            />
-          </div>
-          <Button type="submit" disabled={!newDept.trim()}>
-            + Add Department
-          </Button>
-        </form>
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-      </Card>
+      <motion.div variants={item}>
+        <Card className="p-6">
+          <form onSubmit={handleAdd} className="flex gap-4 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-slate-700 mb-1">New Department Name</label>
+              <input
+                type="text"
+                className="w-full p-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Engineering, Sales, HR..."
+                value={newDept}
+                onChange={(e) => setNewDept(e.target.value)}
+              />
+            </div>
+            <Button type="submit" disabled={!newDept.trim()}>
+              + Add Department
+            </Button>
+          </form>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        </Card>
+      </motion.div>
 
       {/* Departments List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={item}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+      >
         {loading ? (
           <p>Loading...</p>
         ) : departments.length === 0 ? (
@@ -80,7 +104,7 @@ export default function Departments() {
           departments.map((dept) => (
             <Card key={dept._id} className="p-4 flex justify-between items-center hover:shadow-md transition-shadow">
               <span className="font-semibold text-slate-700">{dept.name}</span>
-              <button 
+              <button
                 onClick={() => handleDelete(dept._id)}
                 className="text-red-500 hover:bg-red-50 p-2 rounded-full text-sm"
               >
@@ -89,7 +113,7 @@ export default function Departments() {
             </Card>
           ))
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

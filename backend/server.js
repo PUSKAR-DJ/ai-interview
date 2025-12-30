@@ -1,5 +1,5 @@
+import 'dotenv/config'; // Must be first
 import express from 'express';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import connectDB from './src/config/db.js';
@@ -9,16 +9,15 @@ import authRoutes from './src/routes/authRoutes.js';
 import hrRoutes from './src/routes/hrRoutes.js';
 import interviewRoutes from './src/routes/interviewRoutes.js';
 
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3045;
 
 connectDB();
 
 // Middleware
-app.use(cors({ 
+app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
-  credentials: true 
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

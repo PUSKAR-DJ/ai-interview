@@ -1,4 +1,20 @@
-import StatCard from "./StatCard"; // Assuming you have a basic Card component here
+import { motion } from "framer-motion";
+import StatCard from "./StatCard";
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemAnim = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 export default function StatsGrid({ stats, role }) {
   // Define mappings based on Role
@@ -18,16 +34,22 @@ export default function StatsGrid({ stats, role }) {
   const items = role === "admin" ? adminStats : hrStats;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+    >
       {items.map((item, index) => (
-        <StatCard 
-          key={index}
-          title={item.label}
-          value={item.value}
-          icon={item.icon}
-          color={item.color}
-        />
+        <motion.div key={index} variants={itemAnim}>
+          <StatCard
+            title={item.label}
+            value={item.value}
+            icon={item.icon}
+            color={item.color}
+          />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

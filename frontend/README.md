@@ -1,129 +1,231 @@
-# AI Hiring Platform – Frontend
+# AI Interview Platform – Frontend Architecture & Design (README)
 
-A modern, **Notion-inspired, glassmorphic frontend** for a hiring technology company.
-This repository contains **frontend-only** code built with **React (Vite), JSX, Tailwind CSS, and Framer Motion**.
-
----
-
-## 🧠 Project Philosophy
-
-* **Company-first marketing website**
-
-  * The landing page markets the **company & vision**, not just a single AI product.
-  * The AI Interview Platform is positioned as **one product in a larger ecosystem**.
-
-* **Calm, editorial UI**
-
-  * Inspired by **Notion, Linear, and Stripe**
-  * Minimal, content-first, and highly readable
-  * Subtle glassmorphism (not flashy “AI glow”)
-
-* **Developer-friendly**
-
-  * MERN-oriented structure
-  * JSX (no TypeScript lock-in)
-  * Simple, readable folders
-  * Easy to extend later with APIs
+> **Scope:** Frontend-only documentation for the AI Interview Platform.
+> **Stack:** React (Vite) + JSX + Tailwind CSS + Framer Motion
+> **Audience:** Frontend developers, full‑stack MERN developers, reviewers
 
 ---
 
-## 🎨 Design System (High-Level)
+## 1. Project Overview
 
-* **Style:** Editorial Glass (Notion-inspired)
-* **UI Pattern:** Glassmorphism (used subtly)
-* **Typography:** Inter / Plus Jakarta Sans (clean sans-serif)
-* **Motion:** Minimal micro-interactions via Framer Motion
-* **Responsiveness:** Mobile-first, fully responsive
+This frontend is a **modern, role‑based SaaS application** designed for an AI‑powered interview platform. The UI emphasizes **clarity, calmness, and focus**, inspired by tools like **Notion** and **Linear**.
 
-Glass effects are used mainly for:
+The application has **two major surfaces**:
 
-* Navbar
-* Cards
-* App panels
-* Modals
+1. **Marketing Website (Public)** – company‑first branding
+2. **Application Interface (Authenticated)** – role‑based workflows
+
+Backend logic is intentionally decoupled and consumed via REST APIs.
 
 ---
 
-## 🧱 Tech Stack
+## 2. Design Principles
 
-* **Framework:** React (Vite)
-* **Language:** JavaScript (JSX)
-* **Styling:** Tailwind CSS
-* **Animation:** Framer Motion
-* **Routing:** React Router 
+### Visual Style
+
+* **Glassmorphism** for emphasis surfaces
+* Soft borders, subtle shadows
+* Editorial spacing (generous whitespace)
+* Minimal visual noise
+
+### UX Philosophy
+
+* Content over decoration
+* Calm dashboards (no chart overload)
+* Focus‑first interview experience
+* Clear role separation (Admin / HR / Candidate)
+
+### Accessibility
+
+* High contrast text
+* Large click targets
+* Keyboard‑safe navigation
+* Mobile‑first responsiveness
 
 ---
 
-## 📁 Folder Structure
+## 3. Technology Stack (Frontend Only)
+
+| Layer        | Technology       |
+| ------------ | ---------------- |
+| Framework    | React 18 (Vite)  |
+| Styling      | Tailwind CSS     |
+| Animations   | Framer Motion    |
+| Routing      | React Router DOM |
+| State (Auth) | React Context    |
+| HTTP         | Axios            |
+| Environment  | Vite `.env`      |
+| Deployment   | Vercel           |
+
+---
+
+## 4. High‑Level Architecture
+
+```
+Browser
+  ↓
+React App (Vite)
+  ↓
+React Router (SPA)
+  ↓
+AuthContext (role + status)
+  ↓
+ProtectedRoute (logic enforcement)
+  ↓
+Pages → Components → UI Primitives
+```
+
+**Golden Rule:**
+
+> UI components never call APIs directly. Only hooks/pages do.
+
+---
+
+## 5. User Roles & Flow
+
+### Roles
+
+* **Admin** – system‑wide control
+* **HR** – department‑scoped control
+* **Candidate (Student)** – interview participant
+
+---
+
+### Candidate Flow
+
+```
+Login
+  ↓
+Profile Fetch (/auth/profile)
+  ↓
+interviewStatus === NOT_STARTED
+  → Interview Session
+  → Submit Interview
+  → interviewStatus === COMPLETED
+  ↓
+Result Page
+```
+
+**Key Rule:** Candidate can interview **only once**.
+
+---
+
+### HR Flow
+
+```
+Login
+  ↓
+Profile Fetch (role=hr, departmentId)
+  ↓
+HR Dashboard (Dept‑Scoped)
+  ↓
+Manage Candidates
+  ↓
+View Interview History (Dept Only)
+```
+
+---
+
+### Admin Flow
+
+```
+Login
+  ↓
+Profile Fetch (role=admin)
+  ↓
+Admin Dashboard
+  ↓
+Manage Departments
+Manage HRs
+Manage Candidates
+View All Interviews
+```
+
+---
+
+## 6. Routing & Auth Logic
+
+### Authentication Strategy
+
+* JWT stored in **httpOnly cookies**
+* `AuthContext` fetches `/auth/profile` on app load
+* No token stored in localStorage
+
+### Route Guarding
+
+**ProtectedRoute enforces:**
+
+1. Authentication
+2. Role authorization
+3. Business rules (interview completion)
+
+---
+
+## 7. Folder Structure (Final)
 
 ```
 src/
+├── api/
+│   ├── axios.js
+│   ├── auth.api.js
+│   ├── dashboard.api.js
+│   └── interview.api.js
 │
-├── app/                     # App (post-login) UI
-│   ├── layouts/
-│   │   ├── AppLayout.jsx
-│   │   └── AuthLayout.jsx
-│   │
-│   ├── pages/
-│   │   ├── dashboard/
-│   │   │   └── Dashboard.jsx
-│   │   │
-│   │   ├── interviews/
-│   │   │   ├── InterviewsList.jsx
-│   │   │   ├── InterviewSession.jsx
-│   │   │   └── InterviewSummary.jsx
-│   │   │
-│   │   ├── candidates/
-│   │   │   └── Candidates.jsx
-│   │   │
-│   │   └── settings/
-│   │       └── Settings.jsx
-│   │
-│   └── components/
-│       ├── sidebar/
-│       ├── topbar/
-│       ├── cards/
-│       ├── tables/
-│       └── modals/
-│
-├── marketing/               # Public-facing company website
-│   ├── pages/
-│   │   └── Landing.jsx
-│   │
-│   ├── sections/
-│   │   ├── Hero.jsx
-│   │   ├── WhatWeDo.jsx
-│   │   ├── Products.jsx
-│   │   ├── WhyUs.jsx
-│   │   ├── About.jsx
-│   │   └── Careers.jsx
-│   │
-│   └── components/
-│       ├── Navbar.jsx
-│       └── Footer.jsx
-│
-├── shared/                  # Reusable UI & design system
-│   ├── ui/
-│   │   ├── Button.jsx
-│   │   ├── Card.jsx
-│   │   ├── GlassPanel.jsx
-│   │   └── Badge.jsx
-│   │
-│   ├── motion/
-│   │   └── animations.js
-│   │
-│   └── typography/
-│       └── Text.jsx
+├── context/
+│   └── AuthContext.jsx
 │
 ├── routes/
-│   └── AppRoutes.jsx
+│   ├── AppRoutes.jsx
+│   └── ProtectedRoute.jsx
+│
+├── shared/
+│   └── ui/
+│       ├── Button.jsx
+│       ├── Card.jsx
+│       ├── GlassPanel.jsx
+│       └── index.js
+│
+├── marketing/
+│   ├── pages/
+│   │   ├── Landing.jsx
+│   │   └── Login.jsx
+│   └── sections/
+│       ├── Hero.jsx
+│       ├── WhatWeBuild.jsx
+│       ├── Products.jsx
+│       └── Careers.jsx
+│
+├── app/
+│   ├── layouts/
+│   │   └── AppLayout.jsx
+│   │
+│   ├── components/
+│   │   ├── sidebar/
+│   │   │   └── Sidebar.jsx
+│   │   ├── topbar/
+│   │   │   └── TopBar.jsx
+│   │   ├── dashboard/
+│   │   │   ├── StatsGrid.jsx
+│   │   │   └── ActivityList.jsx
+│   │   └── interview/
+│   │       ├── InterviewHeader.jsx
+│   │       ├── QuestionPanel.jsx
+│   │       ├── ProgressIndicator.jsx
+│   │       └── ControlBar.jsx
+│   │
+│   └── pages/
+│       ├── dashboard/
+│       │   └── Dashboard.jsx
+│       ├── interviews/
+│       │   ├── InterviewSession.jsx
+│       │   └── InterviewResult.jsx (pending)
+│       ├── candidates/
+│       │   └── Candidates.jsx (pending)
+│       └── admin/
+│           └── AdminDashboard.jsx (pending)
 │
 ├── styles/
 │   └── globals.css
-│
-├── assets/
-│   ├── logos/
-│   └── icons/
 │
 ├── App.jsx
 └── main.jsx
@@ -131,20 +233,124 @@ src/
 
 ---
 
-## 🧭 Application Structure Overview
+## 8. Wireframe Summary (Textual)
 
-### 1. Marketing Website (`/marketing`)
+### Marketing Landing
 
-* Company vision & positioning
-* Product overview (AI Interview Platform shown as one product)
-* About, Careers, Trust sections
-* Calm, editorial layout
+* Hero (value proposition)
+* What We Build
+* Products
+* Careers
+* Footer
 
-### 2. Application UI (`/app`)
+### App Layout
 
-* Dashboard (Admin / HR / Candidate views – UI only)
-* Interviews list & interview session screens
-* Candidate management UI
-* Settings & profile pages
+```
+Sidebar | TopBar
+----------------
+Main Content
+```
+
+### Interview Session (Focus Mode)
+
+```
+Interview Header (Role + Timer)
+
+Glass Question Panel
+
+Progress Indicator
+
+Control Bar (Next / Submit)
+```
 
 ---
+
+## 9. Component Mapping
+
+### Shared UI
+
+* `Button` – primary / secondary / ghost
+* `Card` – neutral surfaces
+* `GlassPanel` – emphasis surfaces
+
+### Layout
+
+* `AppLayout`
+* `Sidebar`
+* `TopBar`
+
+### Interview
+
+* `InterviewSession`
+* `InterviewHeader`
+* `QuestionPanel`
+* `ProgressIndicator`
+* `ControlBar`
+
+### Dashboards
+
+* `Dashboard` (generic base)
+* `AdminDashboard` (pending)
+* `HRDashboard` (pending)
+
+---
+
+## 10. State & Data Flow
+
+```
+AuthContext
+  ↓
+ProtectedRoute
+  ↓
+Page Component
+  ↓
+Hook (API call)
+  ↓
+Render UI
+```
+
+---
+
+## 11. Deployment Notes (Frontend)
+
+* Deployed on **Vercel**
+* Requires `vercel.json` for SPA routing
+* Requires backend with:
+
+  * CORS enabled
+  * `sameSite: 'None'` cookies
+
+---
+
+## 12. Current Status
+
+### Completed
+
+* Marketing website
+* App shell
+* Auth & routing logic
+* Interview session UI
+* Shared design system
+* Candidate Result page
+* HR Dashboard
+* Admin Dashboard & HR Manager
+* Candidate Management (Admin/HR)
+* Interview history details
+* Mobile Responsiveness & Layout Polish
+* Advanced animations (Micro-interactions)
+
+### Pending
+
+* None (Ready for Launch 🚀)
+
+---
+
+## 13. Next Steps
+
+1. Final end-to-end testing
+2. Deployment to production environment
+3. Gather user feedback for V2
+
+---
+
+> This README documents the **entire frontend architecture and design system** and is safe to share with developers, reviewers, or maintainers.

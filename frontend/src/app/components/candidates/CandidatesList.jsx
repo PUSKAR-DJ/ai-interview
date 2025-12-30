@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "../../../hooks/useAuth";
 import { getUsers as getAdminUsers, deleteUser } from "../../../api/admin.api";
 import { getMyCandidates, deleteCandidate } from "../../../api/hr.api";
-import CandidateRow from "./CandidateRow"; // Ensure this component exists
+import CandidateRow from "./CandidateRow";
 import Card from "../../../shared/ui/Card";
 
 export default function CandidatesList() {
@@ -15,12 +16,10 @@ export default function CandidatesList() {
     try {
       setLoading(true);
       let data = [];
-      
+
       if (user.role === "admin") {
-        // Admin fetches all users with role="student"
         data = await getAdminUsers("student");
       } else {
-        // HR fetches only their candidates
         data = await getMyCandidates();
       }
       setCandidates(data);
@@ -44,7 +43,6 @@ export default function CandidatesList() {
       } else {
         await deleteCandidate(id);
       }
-      // Remove from UI immediately
       setCandidates(prev => prev.filter(c => c._id !== id));
     } catch (err) {
       alert("Failed to delete candidate");
@@ -66,23 +64,40 @@ export default function CandidatesList() {
               <th className="p-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <motion.tbody
+            className="divide-y divide-slate-100"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.05 }
+              }
+            }}
+          >
             {candidates.length === 0 ? (
               <tr>
-                <td colSpan="4" className="p-8 text-center text-slate-400">
-                  No candidates found. Click "Add Candidate" to start.
+                <td colSpan="4" className="p-12 text-center">
+                  <div className="flex flex-col items-center justify-center text-slate-400">
+                    <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                      <span className="text-2xl">👥</span>
+                    </div>
+                    <p className="font-medium text-slate-600">No candidates found</p>
+                    <p className="text-sm mt-1">Get started by adding a new candidate.</p>
+                  </div>
                 </td>
               </tr>
             ) : (
               candidates.map((candidate) => (
-                <CandidateRow 
-                  key={candidate._id} 
-                  candidate={candidate} 
-                  onDelete={() => handleDelete(candidate._id)} 
+                <CandidateRow
+                  key={candidate._id}
+                  candidate={candidate}
+                  onDelete={() => handleDelete(candidate._id)}
                 />
               ))
             )}
-          </tbody>
+          </motion.tbody>
         </table>
       </div>
     </Card>

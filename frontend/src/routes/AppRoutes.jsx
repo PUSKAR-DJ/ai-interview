@@ -11,9 +11,11 @@ import Unauthorized from "../app/pages/Unauthorized"; // New
 // App Pages
 import Dashboard from "../app/pages/dashboard/Dashboard";
 import InterviewSession from "../app/pages/interviews/InterviewSession";
-import InterviewResult from "../app/pages/interviews/InterviewSummary"; 
+import InterviewResult from "../app/pages/interviews/InterviewResult";
 import Candidates from "../app/pages/candidates/Candidates";
+import CandidateDetails from "../app/pages/candidates/CandidateDetails";
 import Departments from "../app/pages/admin/Departments"; // New
+import HRManager from "../app/pages/admin/HRManager";
 
 export default function AppRoutes() {
   return (
@@ -25,55 +27,73 @@ export default function AppRoutes() {
 
       {/* Protected App Routes */}
       <Route path="/app" element={<AppLayout />}>
-        
+
         {/* Dashboard (Shared) */}
-        <Route 
-          path="dashboard" 
+        <Route
+          path="dashboard"
           element={
             <ProtectedRoute allowedRoles={["admin", "hr"]}>
               <Dashboard />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Departments (Admin Only) */}
-        <Route 
-          path="admin/departments" 
+        <Route
+          path="admin/departments"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <Departments />
             </ProtectedRoute>
-          } 
+          }
+        />
+
+        {/* HR Manager (Admin Only) */}
+        <Route
+          path="admin/hrs"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <HRManager />
+            </ProtectedRoute>
+          }
         />
 
         {/* Candidates (Admin & HR) */}
-        <Route 
-          path="candidates" 
+        <Route
+          path="candidates"
           element={
             <ProtectedRoute allowedRoles={["hr", "admin"]}>
               <Candidates />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="candidates/:id"
+          element={
+            <ProtectedRoute allowedRoles={["hr", "admin"]}>
+              <CandidateDetails />
+            </ProtectedRoute>
+          }
         />
 
         {/* Student: Interview */}
-        <Route 
-          path="interview" 
+        <Route
+          path="interview"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <InterviewSession />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Student: Result */}
-        <Route 
-          path="result" 
+        <Route
+          path="result"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <InterviewResult />
             </ProtectedRoute>
-          } 
+          }
         />
       </Route>
 

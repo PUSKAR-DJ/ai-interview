@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { getProfile, loginUser, logoutUser } from "../api/auth.api";
 
-// 1. Create Context with 'null' as default
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -16,21 +15,18 @@ export function AuthProvider({ children }) {
     try {
       const data = await getProfile();
       setUser(data.user);
+      return data.user;
     } catch (error) {
       setUser(null);
+      return null;
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (credentials) => {
-    const user = await loginUser(credentials);
-    // Directly set user from response or re-fetch
-    // If your loginUser returns the user object, use it directly to save a network call
-    // Otherwise, fetch profile:
-    const profile = await getProfile();
-    setUser(profile.user);
-    return profile.user;
+    await loginUser(credentials);
+    return await checkAuth();
   };
 
   const logout = async () => {
@@ -38,15 +34,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  // 2. Value MUST be an object, even if user is null
-  const value = { user, login, logout, loading };
-
+  // FIX: Expose checkAuth as 'refreshUser'
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, logout, loading, refreshUser: checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// 3. Export Context for the hook to use
 export { AuthContext };

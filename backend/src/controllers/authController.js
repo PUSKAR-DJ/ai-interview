@@ -10,7 +10,7 @@ export const register = async (req, res) => {
   const user = await User.create({ name, email, password: hashedPassword, role });
 
   const token = jwt.sign(
-    { id: user._id, role: user.role },
+    { id: user._id, role: user.role, departmentId: user.departmentId },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
@@ -21,7 +21,7 @@ export const register = async (req, res) => {
     sameSite: "strict",   // CSRF protection
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
   });
-  
+
   res.json({ message: "User Registered", user });
 };
 
@@ -34,7 +34,7 @@ export const login = async (req, res) => {
   if (!valid) return res.status(400).json({ error: "Invalid credentials" });
 
   const token = jwt.sign(
-    { id: user._id, role: user.role },
+    { id: user._id, role: user.role, departmentId: user.departmentId },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
