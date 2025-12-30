@@ -26,6 +26,7 @@ router.use(authMiddleware);
 router.post('/submit', upload.single('audio'), submitInterview);
 router.get('/status', checkInterviewStatus);
 router.get('/result', getInterviewResult);
+router.get('/me', getInterviewResult);
 router.get('/questions', generateDynamicQuestions);
 router.get('/all-completed', getAllInterviews);
 

@@ -66,10 +66,13 @@ export const submitInterview = async (req, res) => {
 
 export const getInterviewResult = async (req, res) => {
   try {
-    const interview = await Interview.findOne({ candidateId: req.user.id }).sort({ createdAt: -1 });
+    console.log("Fetching result for user:", req.user?._id || req.user?.id);
+    const interview = await Interview.findOne({ candidateId: req.user?._id || req.user?.id }).sort({ createdAt: -1 });
+    console.log("Interview found:", interview ? "Yes" : "No");
     if (!interview) return res.status(404).json({ message: "No interview found" });
     res.json(interview);
   } catch (error) {
+    console.error("Error in getInterviewResult:", error);
     res.status(500).json({ message: error.message });
   }
 };

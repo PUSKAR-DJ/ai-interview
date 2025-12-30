@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
+import { motion } from 'framer-motion';
 import { Mic, Send, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../api/axios'; // Use our configured axios instance
