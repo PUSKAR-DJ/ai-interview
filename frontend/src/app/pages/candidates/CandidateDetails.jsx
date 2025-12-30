@@ -49,20 +49,30 @@ export default function CandidateDetails() {
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
     if (!data) return <div className="p-8 text-center text-slate-500">No data found.</div>;
 
-    const { candidate, questions, interviewDate, status } = data;
-    // NOTE: Adjust destructuring based on actual API response shape. 
-    // Assuming response.data contains { candidate: {name, email}, questions: [], ... }
-    // If the API returns the interview object directly, it might be slightly different.
-    // I will assume the structure typically returned by `GET /interviews/:id` is strictly the interview object, 
-    // containing populated candidate info if configured, or I might just have candidate info from the previous list.
-    // Let's assume standard populate: `interview.candidate`
+    const candidate = data?.candidateId || data?.candidate;
+    const transcript = data?.transcript || [];
 
-    // Update: If the API calls `getInterviews` it likely returns an array or single object. 
-    // Let's code defensively.
+    // Map linear transcript to Q/A pairs for display
+    const qList = [];
+    let currentQ = null;
 
-    const candidateName = candidate?.name || data?.name || "Unknown Candidate";
-    const candidateEmail = candidate?.email || data?.email || "No email";
-    const qList = questions || data?.questions || [];
+    transcript.forEach(msg => {
+        if (msg.role === 'assistant') {
+            // New question found
+            if (currentQ) qList.push(currentQ); // Push previous
+            currentQ = { questionText: msg.text, answerText: '' };
+        } else if (msg.role === 'user' && currentQ) {
+            // Answer to current question
+            currentQ.answerText = msg.text;
+            qList.push(currentQ); // Push complete pair
+            currentQ = null;
+        }
+    });
+    // Push unresolved last question if any
+    if (currentQ) qList.push(currentQ);
+
+    const candidateName = candidate?.name || "Unknown Candidate";
+    const candidateEmail = candidate?.email || "No email";
 
     return (
         <motion.div
@@ -90,18 +100,18 @@ export default function CandidateDetails() {
                             <h1 className="text-2xl font-bold text-slate-800">{candidateName}</h1>
                             <div className="flex items-center gap-4 text-slate-500 mt-1 text-sm">
                                 <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {candidateEmail}</span>
-                                {interviewDate && (
-                                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(interviewDate).toLocaleDateString()}</span>
+                                {data.endTime && (
+                                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(data.endTime).toLocaleDateString()}</span>
                                 )}
                             </div>
                         </div>
                     </div>
 
-                    <div className={`px-4 py-2 rounded-full text-sm font-semibold border ${status === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-100' :
-                            status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                                'bg-slate-50 text-slate-700 border-slate-100'
+                    <div className={`px-4 py-2 rounded-full text-sm font-semibold border ${data.status === 'Completed' || data.status === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-100' :
+                        data.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                            'bg-slate-50 text-slate-700 border-slate-100'
                         }`}>
-                        {status?.replace("_", " ")}
+                        {data.status?.replace("_", " ")}
                     </div>
                 </GlassPanel>
             </motion.div>

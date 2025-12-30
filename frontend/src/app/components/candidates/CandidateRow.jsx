@@ -1,8 +1,8 @@
-import { Trash2, Eye } from "lucide-react";
+import { Trash2, Eye, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-export default function CandidateRow({ candidate, onDelete }) {
+export default function CandidateRow({ candidate, onDelete, onEdit }) {
   const navigate = useNavigate();
   const statusConfig = {
     "NOT_STARTED": { label: "Not Started", classes: "bg-slate-100 text-slate-600" },
@@ -26,6 +26,9 @@ export default function CandidateRow({ candidate, onDelete }) {
           {status.label}
         </span>
       </td>
+      <td className="p-4 text-slate-500 font-medium">
+        {candidate.departmentId?.name || "Unassigned"}
+      </td>
       <td className="p-4 text-right">
         <div className="flex justify-end gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
@@ -34,6 +37,13 @@ export default function CandidateRow({ candidate, onDelete }) {
             title="View Details"
           >
             <Eye className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onEdit}
+            className="text-slate-400 hover:text-blue-600 p-2 hover:bg-blue-50 rounded-lg transition-all"
+            title="Edit Candidate"
+          >
+            <Edit className="w-4 h-4" />
           </button>
           <button
             onClick={onDelete}

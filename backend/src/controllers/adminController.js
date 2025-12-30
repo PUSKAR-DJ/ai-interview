@@ -49,9 +49,9 @@ export const deleteDepartment = async (req, res) => {
 // --- User Management (HR & Students) ---
 export const createUser = async (req, res) => {
   try {
-    const {name, email, password, role, departmentId } = req.body;
+    const { name, email, password, role, departmentId } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const user = await User.create({
       name,
       email,
@@ -76,6 +76,25 @@ export const getUsers = async (req, res) => {
   }
 };
 
+export const updateUser = async (req, res) => {
+  try {
+    const { name, email, departmentId, password } = req.body;
+    const updateData = { name, email, departmentId };
+
+    if (password && password.trim() !== "") {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const deleteUser = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
@@ -90,9 +109,9 @@ export const getCandidateInterview = async (req, res) => {
     // Find interview by the candidate's User ID
     const interview = await Interview.findOne({ candidateId: req.params.id })
       .populate("candidateId", "name email"); // Get candidate name
-      
+
     if (!interview) return res.status(404).json({ message: "Interview not found for this candidate" });
-    
+
     res.json(interview);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -1,14 +1,15 @@
 import express from "express";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { isAdmin } from "../middlewares/roleMiddleware.js";
-import { 
-  getAdminOverview, 
-  createDepartment, 
-  getAllDepartments, 
-  deleteDepartment, 
-  createUser, 
-  deleteUser, 
-  getUsers 
+import {
+  getAdminOverview,
+  createDepartment,
+  getAllDepartments,
+  deleteDepartment,
+  createUser,
+  deleteUser,
+  getUsers,
+  updateUser
 } from "../controllers/adminController.js";
 import { getCandidateInterview } from "../controllers/adminController.js";
 
@@ -27,6 +28,7 @@ router.delete("/departments/:id", deleteDepartment);
 // User Routes
 router.get("/users", getUsers);
 router.post("/users", createUser);
+router.put("/users/:id", updateUser);
 router.delete("/users/:id", deleteUser);
 
 router.get("/interviews/:id", getCandidateInterview); // :id is the candidate's User ID

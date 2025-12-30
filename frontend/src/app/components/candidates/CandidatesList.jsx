@@ -1,28 +1,31 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../../hooks/useAuth";
-import { getUsers as getAdminUsers, deleteUser } from "../../../api/admin.api";
-import { getMyCandidates, deleteCandidate } from "../../../api/hr.api";
+import { getUsers as getAdminUsers, deleteUser, updateUser, getDepartments } from "../../../api/admin.api";
+import { getMyCandidates, deleteCandidate, updateCandidate } from "../../../api/hr.api";
 import CandidateRow from "./CandidateRow";
 import Card from "../../../shared/ui/Card";
+import EditUserModal from "../common/EditUserModal"; // Import modal
 
 export default function CandidatesList() {
   const { user } = useAuth();
   const [candidates, setCandidates] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editingCandidate, setEditingCandidate] = useState(null);
 
   const fetchCandidates = async () => {
     try {
       setLoading(true);
-      let data = [];
-
       if (user.role === "admin") {
-        data = await getAdminUsers("student");
+        const [users, depts] = await Promise.all([getAdminUsers("student"), getDepartments()]);
+        setCandidates(users);
+        setDepartments(depts);
       } else {
-        data = await getMyCandidates();
+        const data = await getMyCandidates();
+        setCandidates(data);
       }
-      setCandidates(data);
     } catch (err) {
       console.error("Failed to fetch candidates", err);
       setError("Failed to load candidates.");
@@ -49,6 +52,29 @@ export default function CandidatesList() {
     }
   };
 
+  const handleEditSave = async (id, data) => {
+    let updatedUser = null;
+    if (user.role === "admin") {
+      const res = await updateUser(id, data);
+      updatedUser = res.user;
+    } else {
+      // HR can only edit name/email/password usually, dept is fixed
+      const res = await updateCandidate(id, data);
+      updatedUser = res.user;
+    }
+
+    // Update local state
+    // For admin, if dept changed, we might need to update the populated field manually or refresh
+    // If we returned populated user from backend its easy. Assuming basic user object returned.
+    // Manually repopulate departmentId for display if it's an ID
+    if (updatedUser.departmentId && typeof updatedUser.departmentId === 'string' && departments.length > 0) {
+      const d = departments.find(dept => dept._id === updatedUser.departmentId);
+      if (d) updatedUser.departmentId = d;
+    }
+
+    setCandidates(prev => prev.map(c => c._id === id ? { ...c, ...updatedUser } : c));
+  };
+
   if (loading) return <div className="p-8 text-center text-slate-500">Loading candidates...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
@@ -61,6 +87,7 @@ export default function CandidatesList() {
               <th className="p-4">Name</th>
               <th className="p-4">Email</th>
               <th className="p-4">Status</th>
+              <th className="p-4">Department</th>
               <th className="p-4 text-right">Actions</th>
             </tr>
           </thead>
@@ -78,7 +105,7 @@ export default function CandidatesList() {
           >
             {candidates.length === 0 ? (
               <tr>
-                <td colSpan="4" className="p-12 text-center">
+                <td colSpan="5" className="p-12 text-center">
                   <div className="flex flex-col items-center justify-center text-slate-400">
                     <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3">
                       <span className="text-2xl">👥</span>
@@ -94,12 +121,23 @@ export default function CandidatesList() {
                   key={candidate._id}
                   candidate={candidate}
                   onDelete={() => handleDelete(candidate._id)}
+                  onEdit={() => setEditingCandidate(candidate)}
                 />
               ))
             )}
           </motion.tbody>
         </table>
       </div>
+
+      {editingCandidate && (
+        <EditUserModal
+          user={editingCandidate}
+          departments={departments}
+          isHR={user.role === 'hr'}
+          onClose={() => setEditingCandidate(null)}
+          onSave={handleEditSave}
+        />
+      )}
     </Card>
   );
 }

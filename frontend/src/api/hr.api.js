@@ -12,6 +12,11 @@ export const createCandidate = async (userData) => {
   return response.data;
 };
 
+export const updateCandidate = async (id, userData) => {
+  const response = await api.put(`/hr/candidates/${id}`, userData);
+  return response.data;
+};
+
 export const deleteCandidate = async (id) => {
   const response = await api.delete(`/hr/candidates/${id}`);
   return response.data;

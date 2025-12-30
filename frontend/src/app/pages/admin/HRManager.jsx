@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { getUsers, createUser, deleteUser, getDepartments } from "../../../api/admin.api";
+import { getUsers, createUser, deleteUser, getDepartments, updateUser } from "../../../api/admin.api";
 import Button from "../../../shared/ui/Button";
 import GlassPanel from "../../../shared/ui/GlassPanel";
-import { UserPlus, Trash2, Mail, Building } from "lucide-react";
+import { UserPlus, Trash2, Mail, Building, Edit } from "lucide-react";
+import EditUserModal from "../../components/common/EditUserModal";
 
 // Variants
 const container = {
@@ -21,6 +22,7 @@ export default function HRManager() {
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -50,6 +52,19 @@ export default function HRManager() {
         } catch (err) {
             alert("Failed to delete user.");
         }
+    };
+
+    const handleEditSave = async (id, data) => {
+        const res = await updateUser(id, data);
+        // Update local state finding the updated user in response (res.user) or fallback
+        const updatedUser = res.user;
+        setHrs(prev => prev.map(hr => hr._id === id ? { ...hr, ...updatedUser, departmentId: departments.find(d => d._id === updatedUser.departmentId) || updatedUser.departmentId } : hr));
+        // Note: adminController updateUser returns { message, user }. user has departmentId as ID not populated object usually unless we changed it.
+        // Actually mongoose update returns the document. If we didn't populate in controller, it's just ID.
+        // Quick fix: refresh data is safer, or manual patch.
+        // Manual patch: we have dept ID from data.departmentId. Find it in departments array.
+        const dept = departments.find(d => d._id === data.departmentId);
+        setHrs(prev => prev.map(hr => hr._id === id ? { ...hr, ...data, departmentId: dept } : hr));
     };
 
     return (
@@ -89,12 +104,20 @@ export default function HRManager() {
                                         {hr.email}
                                     </div>
                                 </div>
-                                <button
-                                    onClick={() => handleDelete(hr._id)}
-                                    className="text-slate-300 hover:text-red-500 transition-colors p-1"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={() => setEditingUser(hr)}
+                                        className="text-slate-300 hover:text-blue-500 transition-colors p-1"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(hr._id)}
+                                        className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="pt-3 mt-2 border-t border-slate-100 flex items-center gap-2">
@@ -116,6 +139,15 @@ export default function HRManager() {
                     onClose={() => setIsModalOpen(false)}
                     onSuccess={() => { setIsModalOpen(false); fetchData(); }}
                     departments={departments}
+                />
+            )}
+
+            {editingUser && (
+                <EditUserModal
+                    user={editingUser}
+                    departments={departments}
+                    onClose={() => setEditingUser(null)}
+                    onSave={handleEditSave}
                 />
             )}
         </motion.div>

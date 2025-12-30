@@ -51,6 +51,29 @@ export const createDeptCandidate = async (req, res) => {
   }
 };
 
+export const updateDeptCandidate = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const updateData = { name, email };
+
+    if (password && password.trim() !== "") {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const user = await User.findOneAndUpdate(
+      { _id: req.params.id, departmentId: req.user.departmentId, role: "student" },
+      updateData,
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "Candidate not found or unauthorized" });
+
+    res.json({ message: "Candidate updated", user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // 1. Delete Candidate (Dept Scoped)
 export const deleteDeptCandidate = async (req, res) => {
   try {
