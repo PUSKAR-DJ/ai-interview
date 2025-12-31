@@ -8,6 +8,7 @@ import adminRoutes from './src/routes/adminRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import hrRoutes from './src/routes/hrRoutes.js';
 import interviewRoutes from './src/routes/interviewRoutes.js';
+import questionRoutes from './src/routes/questionRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3045;
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/hr', hrRoutes);
 app.use('/api/interview', interviewRoutes);
+app.use('/api/questions', questionRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

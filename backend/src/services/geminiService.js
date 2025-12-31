@@ -48,16 +48,22 @@ export const analyzeInterview = async (audioUrl, history) => {
     }
 };
 
-export const generateQuestions = async (departmentName, contextQuestions) => {
+export const generateQuestions = async (departmentName, dbQuestions = []) => {
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = `
             You are an expert Interviewer for the ${departmentName} department.
-            Here is a list of standard interview questions for this role:
-            ${JSON.stringify(contextQuestions)}
+            
+            DEPARTMENT: ${departmentName}
+            EXISTING QUESTIONS FROM DATABASE: ${JSON.stringify(dbQuestions)}
 
-            Please generate a set of 3 to 5 challenging, relevant, and dynamic interview questions based on these topics.
-            The questions should be professional and assess the candidate's skills effectively.
+            TASK:
+            Generate a total of 5 to 10 high-quality interview questions.
+            
+            RULES:
+            1. If "EXISTING QUESTIONS FROM DATABASE" has fewer than 5 items, use them as guidance but primarily generate 5-10 fresh questions specific to the ${departmentName} role.
+            2. If "EXISTING QUESTIONS FROM DATABASE" has 5 or more items, select at least 3-5 of the best ones and mix them with 2-5 new AI-generated questions to reach a total of 5-10.
+            3. Ensure the final list is a cohesive interview flow.
             
             Return ONLY a JSON array of strings, e.g. ["Question 1", "Question 2"].
             Do not include any markdown or extra text.
@@ -69,6 +75,8 @@ export const generateQuestions = async (departmentName, contextQuestions) => {
         return JSON.parse(jsonStr);
     } catch (error) {
         console.error("Gemini Generation Error:", error);
-        return contextQuestions.length > 0 ? contextQuestions : ["Tell me about yourself.", "Why this role?"];
+        // Fallback
+        const base = dbQuestions.length > 0 ? dbQuestions.slice(0, 5) : ["Tell me about yourself.", "Explain your experience in this field."];
+        return base;
     }
 };

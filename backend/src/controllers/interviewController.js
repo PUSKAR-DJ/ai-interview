@@ -106,22 +106,19 @@ export const generateDynamicQuestions = async (req, res) => {
     const user = await User.findById(req.user.id).populate('departmentId');
     if (!user.departmentId) return res.status(400).json({ message: "No department assigned" });
 
-    // Get Context Questions
-    const questions = await Question.find({ departmentId: user.departmentId._id });
-    const questionTexts = questions.map(q => q.text);
+    // Fetch Custom Questions from DB
+    const dbQuestions = await Question.find({ departmentId: user.departmentId._id });
+    const questionTexts = dbQuestions.map(q => q.text);
 
-    // Generate via AI
-    let dynamicQuestions = [];
-    if (questionTexts.length > 0) {
-      dynamicQuestions = await generateQuestions(user.departmentId.name, questionTexts);
-    } else {
-      // Fallback if no questions in DB
-      dynamicQuestions = await generateQuestions(user.departmentId.name, ["Tell me about yourself", "What are your strengths?", "Why do you want to join us?"]);
-    }
+    // AI will handle the logic:
+    // If < 5, fill gap with AI.
+    // If >= 5, mix some DB with few AI.
+    // Result will be 5-10 questions.
+    const finalQuestions = await generateQuestions(user.departmentId.name, questionTexts);
 
     res.json({
       department: user.departmentId.name,
-      questions: dynamicQuestions
+      questions: finalQuestions
     });
 
   } catch (error) {

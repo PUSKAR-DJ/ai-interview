@@ -16,6 +16,7 @@ import Candidates from "../app/pages/candidates/Candidates";
 import CandidateDetails from "../app/pages/candidates/CandidateDetails";
 import Departments from "../app/pages/admin/Departments"; // New
 import HRManager from "../app/pages/admin/HRManager";
+import Questions from "../app/pages/questions/Questions";
 
 export default function AppRoutes() {
   return (
@@ -67,6 +68,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["hr", "admin"]}>
               <Candidates />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="questions"
+          element={
+            <ProtectedRoute allowedRoles={["hr", "admin"]}>
+              <Questions />
             </ProtectedRoute>
           }
         />

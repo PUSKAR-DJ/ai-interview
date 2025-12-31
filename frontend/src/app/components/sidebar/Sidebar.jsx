@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
-import { LayoutDashboard, Users, Building, Video, Award, UserCog, LogOut, X } from "lucide-react";
+import { LayoutDashboard, Users, Building, Video, Award, UserCog, LogOut, X, BookOpen } from "lucide-react";
 import { getInitials } from "../../../shared/utils/string";
 
 export default function Sidebar({ className = "w-64 hidden md:flex", onMobileClose }) {
@@ -38,6 +38,12 @@ export default function Sidebar({ className = "w-64 hidden md:flex", onMobileClo
       path: "/app/admin/hrs",
       roles: ["admin"],
       icon: UserCog
+    },
+    {
+      label: "Questions",
+      path: "/app/questions",
+      roles: ["admin", "hr"],
+      icon: BookOpen
     },
     // Student Only
     {
