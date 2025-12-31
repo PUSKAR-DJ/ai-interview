@@ -11,14 +11,10 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// Configure Multer (Temp Storage)
-const upload = multer({ dest: 'uploads/' });
+import os from 'os';
 
-// Ensure uploads directory exists (Create if needed in server loop, but usually multer handles it or we ensure manual creation)
-import fs from 'fs';
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
+// Configure Multer (Temp Storage for Vercel compatibility)
+const upload = multer({ dest: os.tmpdir() });
 
 // All routes are protected
 router.use(authMiddleware);

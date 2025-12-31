@@ -2,16 +2,13 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Ensure temp directory exists
-const tempDir = "./public/temp";
-if (!fs.existsSync(tempDir)) {
-  fs.mkdirSync(tempDir, { recursive: true });
-}
+import os from "os";
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, tempDir);
+    // Vercel only allows writing to /tmp
+    cb(null, os.tmpdir());
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
