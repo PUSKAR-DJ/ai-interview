@@ -144,7 +144,7 @@ export default function InterviewResult() {
 
           <div className="relative space-y-2">
             <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic">Interview Report</h1>
-            <p className="text-slate-400 text-base md:text-lg max-w-xl mx-auto font-medium">Session analysis completed. Your performance metrics and verified transcript are ready below.</p>
+            <p className="text-slate-300 text-base md:text-lg max-w-xl mx-auto font-medium">Session analysis completed. Your performance metrics and verified transcript are ready below.</p>
           </div>
 
           {/* Audio Player for Students */}
@@ -171,7 +171,7 @@ export default function InterviewResult() {
           {/* Main Score Card */}
           <div className="md:col-span-8">
             <GlassPanel className="p-8 md:p-10 h-full bg-slate-900/40 border-white/5 rounded-[2rem] flex flex-col">
-              <div className="flex items-center gap-3 text-blue-400 font-black uppercase tracking-[0.2em] text-[10px] mb-8">
+              <div className="flex items-center gap-3 text-indigo-400 font-black uppercase tracking-[0.2em] text-[10px] mb-8">
                 <Star className="w-4 h-4" /> Performance Rating
               </div>
 
@@ -179,13 +179,13 @@ export default function InterviewResult() {
                 <motion.span
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="text-8xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-400 to-indigo-400 leading-none"
+                  className="text-8xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-300 to-indigo-500 leading-none"
                 >
                   {score}
                 </motion.span>
                 <div className="space-y-1">
-                  <span className="text-3xl text-slate-700 font-extrabold block">/ 100</span>
-                  <span className="text-[10px] font-black text-green-500 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded">AI Verified</span>
+                  <span className="text-3xl text-slate-500 font-extrabold block">/ 100</span>
+                  <span className="text-[10px] font-black text-green-400 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded">AI Verified</span>
                 </div>
               </div>
 
@@ -198,11 +198,11 @@ export default function InterviewResult() {
                 ></motion.div>
               </div>
 
-              <div className="mt-auto p-6 bg-white/2 rounded-2xl border border-white/5">
+              <div className="mt-auto p-6 bg-white/5 rounded-2xl border border-white/10">
                 <h3 className="text-lg font-black text-white flex items-center gap-3 mb-4 uppercase tracking-tight">
                   <MessageSquare className="w-5 h-5 text-indigo-400" /> Professional Feedback
                 </h3>
-                <p className="text-slate-400 leading-relaxed italic text-lg opacity-90">
+                <p className="text-slate-100 leading-relaxed italic text-lg shadow-sm">
                   "{feedback}"
                 </p>
               </div>
@@ -213,35 +213,35 @@ export default function InterviewResult() {
           <div className="md:col-span-4 space-y-6">
             <GlassPanel className="p-8 bg-slate-900/60 border-white/5 rounded-[2rem] space-y-8" hoverEffect={false}>
               <div className="flex items-center gap-5 group">
-                <div className="p-4 bg-blue-500/10 text-blue-400 rounded-2xl border border-blue-500/10 group-hover:scale-110 transition-transform">
+                <div className="p-4 bg-indigo-500/20 text-indigo-300 rounded-2xl border border-indigo-500/20 group-hover:scale-110 transition-transform">
                   <Calendar className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Time Finished</p>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Time Finished</p>
                   <p className="font-black text-white text-lg tracking-tight">{new Date(result.endTime || result.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-5 group">
-                <div className="p-4 bg-indigo-500/10 text-indigo-400 rounded-2xl border border-indigo-500/10 group-hover:scale-110 transition-transform">
+                <div className="p-4 bg-indigo-500/20 text-indigo-300 rounded-2xl border border-indigo-500/20 group-hover:scale-110 transition-transform">
                   <Hash className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Total Topics</p>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Total Topics</p>
                   <p className="font-black text-white text-lg tracking-tight">{transcriptPairs.length} Discussion Points</p>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/5">
-                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-4">Verification Status</p>
-                <div className="flex items-center gap-3 px-4 py-3 bg-green-500/10 text-green-400 rounded-2xl border border-green-500/10">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+              <div className="pt-6 border-t border-white/10">
+                <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4">Verification Status</p>
+                <div className="flex items-center gap-3 px-4 py-3 bg-green-500/20 text-green-300 rounded-2xl border border-green-500/20">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
                   <span className="text-xs font-black uppercase tracking-widest">Report Validated</span>
                 </div>
               </div>
             </GlassPanel>
 
-            <Button onClick={() => window.print()} variant="outline" className="w-full border-white/5 bg-white/2 hover:bg-white/5 text-slate-500 hover:text-white py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all">
+            <Button onClick={() => window.print()} variant="outline" className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-slate-100 py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all">
               Export PDF Transcript
             </Button>
           </div>
@@ -265,8 +265,8 @@ export default function InterviewResult() {
                       {(index + 1).toString().padStart(2, '0')}
                     </span>
                     <div className="space-y-4 flex-1">
-                      <div className="p-6 bg-slate-900/40 rounded-[1.5rem] rounded-tl-none border border-white/5 shadow-2xl">
-                        <p className="font-black text-slate-100 text-lg md:text-xl tracking-tight leading-tight mb-2 uppercase text-[10px] opacity-30">Analytical Query</p>
+                      <div className="p-6 bg-slate-900 border border-white/10 rounded-[1.5rem] rounded-tl-none shadow-2xl">
+                        <p className="font-black text-indigo-400/60 text-[10px] tracking-widest uppercase mb-2">Analytical Query</p>
                         <p className="font-black text-white text-lg md:text-xl tracking-tight leading-tight">{pair.question}</p>
                       </div>
                       <div className="p-8 bg-blue-600/5 rounded-[1.5rem] rounded-tr-none border border-blue-500/10 border-l-4 border-l-blue-600">
@@ -308,8 +308,8 @@ export default function InterviewResult() {
               </Button>
             </div>
 
-            <div className="pt-8 border-t border-white/5">
-              <p className="text-slate-800 text-[9px] font-black uppercase tracking-[0.5em]">System ID: {result._id?.substring(0, 8)} • AI Engine: Gemini 1.5 Flash</p>
+            <div className="pt-8 border-t border-white/10">
+              <p className="text-slate-500 text-[9px] font-bold uppercase tracking-[0.5em]">System ID: {result._id?.substring(0, 8)} • AI Engine: Gemini 1.5 Flash</p>
             </div>
           </GlassPanel>
         </div>

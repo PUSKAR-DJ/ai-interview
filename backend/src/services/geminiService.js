@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const analyzeInterview = async (audioUrl, history) => {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // Using Flash as requested
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // 1. Fetch the audio from Cloudinary
         const response = await fetch(audioUrl);
@@ -50,7 +50,7 @@ export const analyzeInterview = async (audioUrl, history) => {
 
 export const generateQuestions = async (departmentName, dbQuestions = []) => {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const prompt = `
             You are an expert Interviewer for the ${departmentName} department.
             
