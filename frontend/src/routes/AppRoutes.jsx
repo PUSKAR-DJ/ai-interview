@@ -28,6 +28,9 @@ export default function AppRoutes() {
       {/* Protected App Routes */}
       <Route path="/app" element={<AppLayout />}>
 
+        {/* 🔥 FIX: Default Redirect from /app to /app/dashboard */}
+        <Route index element={<Navigate to="dashboard" replace />} />
+
         {/* Dashboard (Shared) */}
         <Route
           path="dashboard"

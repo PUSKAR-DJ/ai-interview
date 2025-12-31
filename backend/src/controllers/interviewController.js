@@ -45,7 +45,7 @@ export const submitInterview = async (req, res) => {
       aiScore: analysis.score || 0,
       aiAnalysis: analysis,
       feedback: analysis.feedback || "Processed",
-      transcript: messages,
+      transcript: analysis.fullTranscript || messages,
       status: 'Completed',
       endTime: new Date()
     });

@@ -31,6 +31,7 @@ export const analyzeInterview = async (audioUrl, history) => {
             2. "feedback": A concise paragraph summary of the candidate's performance.
             3. "strengths": A list of strings.
             4. "improvements": A list of strings.
+            5. "fullTranscript": An array of objects matching the input history format, but replacing any placeholder user text with the actual transcribed spoken content from the audio part. Ensure the assistant questions remain intact.
             
             Do NOT include markdown formatting in the response, just the raw JSON.
         `;

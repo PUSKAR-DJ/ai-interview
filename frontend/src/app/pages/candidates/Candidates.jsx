@@ -17,13 +17,13 @@ export default function Candidates() {
     <motion.div {...pageTransition} className="space-y-8">
       {/* Pass handler to Header */}
       <CandidatesHeader onAdd={() => setIsModalOpen(true)} />
-      
+
       {/* Pass refreshKey to List so it knows when to update */}
       <CandidatesList key={refreshKey} />
 
       {/* The Modal */}
-      <AddCandidateModal 
-        isOpen={isModalOpen} 
+      <AddCandidateModal
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleSuccess}
       />
