@@ -1,10 +1,5 @@
-
-
 {
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://ai-interview-nsxq.vercel.app/api/$1"
-    }
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
