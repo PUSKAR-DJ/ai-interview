@@ -93,13 +93,21 @@ export const deleteDeptCandidate = async (req, res) => {
 // 2. View Interview (Dept Scoped)
 export const getDeptInterview = async (req, res) => {
   try {
-    // Ensure the interview belongs to a candidate in HR's department
-    const interview = await Interview.findOne({
-      candidateId: req.params.id,
+    // First, check if the candidate belongs to HR's department
+    const candidate = await User.findOne({
+      _id: req.params.id,
+      role: "student",
       departmentId: req.user.departmentId
-    }).populate("candidateId", "name");
+    });
 
-    if (!interview) return res.status(404).json({ message: "Interview not found or unauthorized" });
+    if (!candidate) return res.status(404).json({ message: "Candidate not found or not in your department" });
+
+    // Now find the interview for this candidate
+    const interview = await Interview.findOne({
+      candidateId: req.params.id
+    }).populate("candidateId", "name email");
+
+    if (!interview) return res.status(404).json({ message: "Interview not found" });
     res.json(interview);
   } catch (error) {
     res.status(500).json({ error: error.message });

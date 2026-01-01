@@ -19,16 +19,31 @@ export default function InterviewSession() {
   const [questions, setQuestions] = useState([]);
   const [deptName, setDeptName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [isComplete, setIsComplete] = useState(false);
 
   // Audio Refs
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
+  const chatContainerRef = useRef(null);
+  const initializedRef = useRef(false);
+
+  // Autoscroll to bottom when messages change
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   // Initial Permission Check and Status Check
   useEffect(() => {
     const checkStatus = async () => {
+      if (initializedRef.current) return;
+      initializedRef.current = true;
+
       try {
+        setLoadingQuestions(true);
         // 1. Check Previous Interview
         const res = await api.get('/interview/status');
         if (res.data.completed) {
@@ -40,18 +55,20 @@ export default function InterviewSession() {
         // 2. Fetch Dynamic AI Questions
         const qRes = await api.get('/interview/questions');
         if (qRes.data) {
-          setQuestions(qRes.data.questions);
+          setQuestions(qRes.data.questions || []);
           setDeptName(qRes.data.department);
 
-          // Set Initial Welcome Message
-          setMessages([{
+          // Set Initial Welcome Message ONLY if no messages exist
+          setMessages(prev => prev.length === 0 ? [{
             role: 'assistant',
             text: `Hello! I am your AI Interviewer today. I will be asking you questions relevant to your ${qRes.data.department} department. When you are ready, please start the interview.`
-          }]);
+          }] : prev);
         }
       } catch (e) {
         console.error("Failed to init interview", e);
         setMessages([{ role: 'assistant', text: "Error loading questions. Please contact HR." }]);
+      } finally {
+        setLoadingQuestions(false);
       }
     };
     checkStatus();
@@ -70,7 +87,7 @@ export default function InterviewSession() {
   };
 
   const startInterview = async () => {
-    if (!hasPermission) return;
+    if (!hasPermission || loadingQuestions || questions.length === 0) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -86,14 +103,10 @@ export default function InterviewSession() {
       startTimer();
 
       // Initial Question - AI Speaks instantly
-      if (questions.length > 0) {
-        setTimeout(() => {
-          setMessages(prev => [...prev, { role: 'assistant', text: questions[0] }]);
-          setCurrentQuestionIndex(1);
-        }, 500);
-      } else {
-        setMessages(prev => [...prev, { role: 'assistant', text: "No questions configured for this department." }]);
-      }
+      setTimeout(() => {
+        setMessages(prev => [...prev, { role: 'assistant', text: questions[0] }]);
+        setCurrentQuestionIndex(1);
+      }, 500);
     } catch (err) {
       console.error(err);
     }
@@ -194,7 +207,7 @@ export default function InterviewSession() {
       </header>
 
       {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-slate-900 scroll-smooth">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-slate-900 scroll-smooth">
         {!isRecording && recordingTime === 0 && (
           <div className="h-full flex flex-col items-center justify-center text-center">
             <div className="w-20 h-20 bg-blue-600/10 rounded-full flex items-center justify-center mb-6 text-blue-500 ring-4 ring-blue-600/5">
@@ -207,8 +220,12 @@ export default function InterviewSession() {
               <p className="flex items-center gap-2 justify-center"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Best results with headphones</p>
             </div>
 
-            <button onClick={startInterview} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-xl shadow-blue-900/40 transition-all hover:scale-105 flex items-center gap-3">
-              <Mic size={22} /> Start Now
+            <button
+              disabled={loadingQuestions || questions.length === 0}
+              onClick={startInterview}
+              className={`bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-xl shadow-blue-900/40 transition-all hover:scale-105 flex items-center gap-3 ${(loadingQuestions || questions.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <Mic size={22} /> {loadingQuestions ? "Loading Questions..." : "Start Now"}
             </button>
           </div>
         )}
@@ -244,19 +261,24 @@ export default function InterviewSession() {
             </div>
 
             <button
+              disabled={isComplete}
               onClick={() => {
+                if (isComplete) return;
+
                 if (currentQuestionIndex < questions.length) {
-                  setMessages(prev => [...prev, { role: 'user', text: "(Response Recorded)" }]);
+                  setMessages(prev => [...prev, { role: 'user', text: "Response Recorded" }]);
                   setTimeout(() => {
                     setMessages(prev => [...prev, { role: 'assistant', text: questions[currentQuestionIndex] }]);
                     setCurrentQuestionIndex(prev => prev + 1);
-                  }, 2000); // Reduced artificial delay for better snappy feel
+                  }, 2000);
                 } else {
+                  setMessages(prev => [...prev, { role: 'user', text: "Response Recorded" }]);
                   setMessages(prev => [...prev, { role: 'assistant', text: "Excellent. I have all the information I need. Please click 'Finish' to submit your interview." }]);
+                  setIsComplete(true);
                 }
               }}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 md:p-5 rounded-full hover:from-blue-500 hover:to-indigo-500 transition-all shadow-xl shadow-blue-900/50 flex-shrink-0 active:scale-95"
-              title="End Answer & Next Question"
+              className={`bg-gradient-to-r from-blue-600 to-indigo-600 p-4 md:p-5 rounded-full hover:from-blue-500 hover:to-indigo-500 transition-all shadow-xl shadow-blue-900/50 flex-shrink-0 active:scale-95 ${isComplete ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+              title={isComplete ? "Interview Ended" : "End Answer & Next Question"}
             >
               <Send size={24} className="text-white" />
             </button>

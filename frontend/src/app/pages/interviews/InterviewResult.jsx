@@ -26,7 +26,8 @@ const isNoise = (text) => {
     /^thank you for your time/i,
     /^goodbye/i,
     /^all the best/i,
-    /^i will be asking you questions/i
+    /^i will be asking you questions/i,
+    /^excellent\. i have all the information/i
   ];
   return noisePatterns.some(pattern => pattern.test(text.trim()));
 };
@@ -274,7 +275,9 @@ export default function InterviewResult() {
                           <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em]">Candidate Voice Transcription</span>
                         </div>
                         <p className="text-slate-200 text-lg md:text-xl leading-relaxed font-medium">
-                          {pair.answer || <span className="text-slate-600 italic font-normal">No audio detected or transcription failed.</span>}
+                          {(pair.answer && pair.answer !== "[[CANDIDATE_RESPONSE]]" && pair.answer !== "Response Recorded" && pair.answer !== "(Response Recorded)")
+                            ? pair.answer
+                            : <span className="text-slate-600 italic font-normal">No audio detected or transcription failed.</span>}
                         </p>
                       </div>
                     </div>
@@ -309,7 +312,7 @@ export default function InterviewResult() {
             </div>
 
             <div className="pt-8 border-t border-white/10">
-              <p className="text-slate-500 text-[9px] font-bold uppercase tracking-[0.5em]">System ID: {result._id?.substring(0, 8)} • AI Engine: Gemini 1.5 Flash</p>
+              <p className="text-slate-500 text-[9px] font-bold uppercase tracking-[0.5em]">System ID: {result._id?.substring(0, 8)} • AI Engine: Gemini 2.5 Flash</p>
             </div>
           </GlassPanel>
         </div>

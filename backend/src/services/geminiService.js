@@ -4,9 +4,26 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+/**
+ * Robustly extract JSON block from text
+ */
+const parseJSON = (text) => {
+    try {
+        const jsonMatch = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+        const jsonStr = jsonMatch ? jsonMatch[0] : text;
+        return JSON.parse(jsonStr);
+    } catch (e) {
+        console.error("JSON Parse Error:", e, "Raw Text:", text);
+        throw new Error("Invalid response format from AI");
+    }
+};
+
 export const analyzeInterview = async (audioUrl, history) => {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash", // Using stable 2.5 flash for better accuracy
+            systemInstruction: "You are a professional, strict verbatim stenographer and HR analyst. Your primary goal is to transcribe audio exactly as spoken, without any embellishments or corrections."
+        });
 
         // 1. Fetch the audio from Cloudinary
         const response = await fetch(audioUrl);
@@ -22,29 +39,48 @@ export const analyzeInterview = async (audioUrl, history) => {
         };
 
         const prompt = `
-            You are an expert HR Interviewer. 
-            Analyze this interview recording. 
-            The context of the questions asked is: ${JSON.stringify(history)}.
+            Analyze this interview recording based on the provided history.
             
-            Please provide a JSON response with:
-            1. "score": An integer from 0-100 based on confidence, clarity, and content.
-            2. "feedback": A concise paragraph summary of the candidate's performance.
-            3. "strengths": A list of strings.
-            4. "improvements": A list of strings.
-            5. "fullTranscript": An array of objects matching the input history format, but replacing any placeholder user text with the raw, unenhanced transcription of the spoken content from the audio part. Do not correct grammar, remove hesitations, or enhance the language in any way. Provide the verbatim words spoken by the candidate, including any repetitions, pauses, or informal speech. Ensure the assistant questions remain intact.
+            HISTORY CONTEXT: ${JSON.stringify(history)}
             
-            Do NOT include markdown formatting in the response, just the raw JSON.
+            OBJECTIVES:
+            1. FULL TRANSCRIPT: For every user message that says "Response Recorded", replace it with the REAL, VERBATIM transcription of the candidate's actual speech from the audio.
+            2. ANALYSIS: Provide a score and professional feedback.
+
+            STRICT TRANSCRIPTION RULES:
+            - Provide a STENOGRAPHICAL transcription. 
+            - DO NOT enhance vocabulary or grammar.
+            - DO NOT assume what the candidate meant; transcribe exactly what they said.
+            - Include filler words (um, uh, like) and repetitions.
+            - If a candidate stops mid-sentence, transcribe it that way.
+            - If a question was skipped or no answer is found in the audio for it, use "[No response captured]".
+            - CRITICAL: Never invent or 'hallucinate' a professional answer. If the candidate gave a poor or short answer, the transcription must reflect that.
+
+            JSON RESPONSE FORMAT:
+            {
+                "score": 85,
+                "feedback": "...",
+                "strengths": ["...", "..."],
+                "improvements": ["...", "..."],
+                "fullTranscript": [ ... updated history objects ... ]
+            }
+            
+            Return ONLY the raw JSON.
         `;
 
         const result = await model.generateContent([prompt, audioPart]);
         const text = result.response.text();
-
-        const jsonStr = text.replace(/```json/g, '').replace(/```/g, '');
-        return JSON.parse(jsonStr);
+        return parseJSON(text);
 
     } catch (error) {
         console.error("Gemini Analysis Error:", error);
-        return { score: 0, feedback: "Analysis Failed: " + error.message, strengths: [], improvements: [] };
+        return {
+            score: 0,
+            feedback: "Analysis Failed: " + error.message,
+            strengths: [],
+            improvements: [],
+            fullTranscript: history.map(m => m.text === "Response Recorded" ? { ...m, text: "[Transcription Failed]" } : m)
+        };
     }
 };
 
@@ -55,28 +91,32 @@ export const generateQuestions = async (departmentName, dbQuestions = []) => {
             You are an expert Interviewer for the ${departmentName} department.
             
             DEPARTMENT: ${departmentName}
-            EXISTING QUESTIONS FROM DATABASE: ${JSON.stringify(dbQuestions)}
+            EXISTING QUESTIONS: ${JSON.stringify(dbQuestions)}
 
             TASK:
-            Generate a total of 5 to 10 high-quality interview questions.
+            Generate a list of 5 to 10 technical and behavioral interview questions.
             
             RULES:
-            1. If "EXISTING QUESTIONS FROM DATABASE" has fewer than 5 items, use them as guidance but primarily generate 5-10 fresh questions specific to the ${departmentName} role.
-            2. If "EXISTING QUESTIONS FROM DATABASE" has 5 or more items, select at least 3-5 of the best ones and mix them with 2-5 new AI-generated questions to reach a total of 5-10.
-            3. Ensure the final list is a cohesive interview flow.
+            1. Ensure all items in the list are actual QUESTIONS.
+            2. Mix existing questions with new ones if needed to reach at least 5-10.
+            3. Do NOT include any intro text, thoughts, or formatting.
+            4. If no department-specific questions can be made, ask about general professional experience and problem-solving.
             
-            Return ONLY a JSON array of strings, e.g. ["Question 1", "Question 2"].
-            Do not include any markdown or extra text.
+            Return ONLY a JSON array of strings: ["Q1", "Q2", ...]
         `;
 
         const result = await model.generateContent(prompt);
         const text = result.response.text();
-        const jsonStr = text.replace(/```json/g, '').replace(/```/g, '');
-        return JSON.parse(jsonStr);
+        const questions = parseJSON(text);
+
+        // Final safety check: filter out any obviously non-question items (optional but good)
+        return questions.filter(q => typeof q === 'string' && q.trim().length > 5);
+
     } catch (error) {
         console.error("Gemini Generation Error:", error);
-        // Fallback
-        const base = dbQuestions.length > 0 ? dbQuestions.slice(0, 5) : ["Tell me about yourself.", "Explain your experience in this field."];
-        return base;
+        const fallback = dbQuestions.length >= 5
+            ? dbQuestions.slice(0, 5)
+            : ["Tell me about your background.", "What are your greatest professional strengths?", "Describe a difficult challenge you fixed.", "Where do you see yourself in 5 years?", "Why should we hire you?"];
+        return fallback;
     }
 };

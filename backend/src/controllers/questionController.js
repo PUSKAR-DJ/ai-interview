@@ -40,7 +40,8 @@ export const createQuestion = async (req, res) => {
         }
 
         // Role check: HR can only add to their own department
-        if (req.user.role === 'hr' && req.user.departmentId?.toString() !== departmentId) {
+        const userDeptId = req.user.departmentId?._id?.toString() || req.user.departmentId?.toString();
+        if (req.user.role === 'hr' && userDeptId !== departmentId) {
             return res.status(403).json({ message: "HR can only add questions to their own department" });
         }
 
@@ -72,12 +73,13 @@ export const updateQuestion = async (req, res) => {
         }
 
         // Role check
-        if (req.user.role === 'hr' && question.departmentId.toString() !== req.user.departmentId?.toString()) {
+        const userDeptId = req.user.departmentId?._id?.toString() || req.user.departmentId?.toString();
+        if (req.user.role === 'hr' && question.departmentId.toString() !== userDeptId) {
             return res.status(403).json({ message: "Unauthorized to update this question" });
         }
 
         // If HR is trying to change the department
-        if (req.user.role === 'hr' && departmentId && departmentId !== req.user.departmentId?.toString()) {
+        if (req.user.role === 'hr' && departmentId && departmentId !== userDeptId) {
             return res.status(403).json({ message: "HR cannot change the department of a question" });
         }
 
@@ -109,7 +111,8 @@ export const deleteQuestion = async (req, res) => {
         }
 
         // Role check
-        if (req.user.role === 'hr' && question.departmentId.toString() !== req.user.departmentId?.toString()) {
+        const userDeptId = req.user.departmentId?._id?.toString() || req.user.departmentId?.toString();
+        if (req.user.role === 'hr' && question.departmentId.toString() !== userDeptId) {
             return res.status(403).json({ message: "Unauthorized to delete this question" });
         }
 
