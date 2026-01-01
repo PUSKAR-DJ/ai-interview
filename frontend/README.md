@@ -91,58 +91,6 @@ Pages → Components → UI Primitives
 
 ---
 
-### Candidate Flow
-
-```
-Login
-  ↓
-Profile Fetch (/auth/profile)
-  ↓
-interviewStatus === NOT_STARTED
-  → Interview Session
-  → Submit Interview
-  → interviewStatus === COMPLETED
-  ↓
-Result Page
-```
-
-**Key Rule:** Candidate can interview **only once**.
-
----
-
-### HR Flow
-
-```
-Login
-  ↓
-Profile Fetch (role=hr, departmentId)
-  ↓
-HR Dashboard (Dept‑Scoped)
-  ↓
-Manage Candidates
-  ↓
-View Interview History (Dept Only)
-```
-
----
-
-### Admin Flow
-
-```
-Login
-  ↓
-Profile Fetch (role=admin)
-  ↓
-Admin Dashboard
-  ↓
-Manage Departments
-Manage HRs
-Manage Candidates
-View All Interviews
-```
-
----
-
 ## 6. Routing & Auth Logic
 
 ### Authentication Strategy
@@ -161,18 +109,26 @@ View All Interviews
 
 ---
 
-## 7. Folder Structure (Final)
+## 7. Folder Structure (Latest)
 
-```
+```text
 src/
 ├── api/
 │   ├── axios.js
 │   ├── auth.api.js
+│   ├── admin.api.js
 │   ├── dashboard.api.js
-│   └── interview.api.js
+│   ├── hr.api.js
+│   ├── interview.api.js
+│   └── question.api.js        # [NEW] Question Bank CRUD
 │
 ├── context/
 │   └── AuthContext.jsx
+│
+├── hooks/
+│   ├── useAuth.js
+│   ├── useDashboard.js
+│   └── useInterview.js        # Core logic for audio & timer
 │
 ├── routes/
 │   ├── AppRoutes.jsx
@@ -191,41 +147,32 @@ src/
 │   │   └── Login.jsx
 │   └── sections/
 │       ├── Hero.jsx
-│       ├── WhatWeBuild.jsx
 │       ├── Products.jsx
-│       └── Careers.jsx
+│       ├── About.jsx
+│       └── Philosophy.jsx
 │
 ├── app/
 │   ├── layouts/
 │   │   └── AppLayout.jsx
 │   │
 │   ├── components/
-│   │   ├── sidebar/
-│   │   │   └── Sidebar.jsx
-│   │   ├── topbar/
-│   │   │   └── TopBar.jsx
-│   │   ├── dashboard/
-│   │   │   ├── StatsGrid.jsx
-│   │   │   └── ActivityList.jsx
-│   │   └── interview/
-│   │       ├── InterviewHeader.jsx
-│   │       ├── QuestionPanel.jsx
-│   │       ├── ProgressIndicator.jsx
-│   │       └── ControlBar.jsx
+│   │   ├── sidebar/           # Sidebar.jsx
+│   │   ├── topbar/            # TopBar.jsx
+│   │   ├── dashboard/         # StatsGrid.jsx, ActivityList.jsx
+│   │   ├── interview/         # InterviewHeader.jsx, QuestionPanel.jsx
+│   │   ├── interview-summary/ # SectionFeedback.jsx
+│   │   ├── candidates/        # CandidatesList.jsx, AddCandidateModal.jsx
+│   │   └── questions/         # QuestionModal.jsx
 │   │
 │   └── pages/
-│       ├── dashboard/
-│       │   └── Dashboard.jsx
-│       ├── interviews/
-│       │   ├── InterviewSession.jsx
-│       │   └── InterviewResult.jsx (pending)
-│       ├── candidates/
-│       │   └── Candidates.jsx (pending)
-│       └── admin/
-│           └── AdminDashboard.jsx (pending)
+│       ├── dashboard/         # Dashboard.jsx, HRDashboard.jsx
+│       ├── interviews/        # InterviewSession.jsx, InterviewResult.jsx
+│       ├── candidates/        # Candidates.jsx, CandidateDetails.jsx
+│       ├── admin/             # AdminDashboard.jsx, Departments.jsx, HRManager.jsx
+│       └── questions/         # Questions.jsx (Management Room)
 │
 ├── styles/
-│   └── globals.css
+│   └── globals.css            # Indigo Design System definitions
 │
 ├── App.jsx
 └── main.jsx
@@ -233,124 +180,49 @@ src/
 
 ---
 
-## 8. Wireframe Summary (Textual)
+## 8. UX & Design System
 
-### Marketing Landing
-
-* Hero (value proposition)
-* What We Build
-* Products
-* Careers
-* Footer
-
-### App Layout
-
-```
-Sidebar | TopBar
-----------------
-Main Content
-```
-
-### Interview Session (Focus Mode)
-
-```
-Interview Header (Role + Timer)
-
-Glass Question Panel
-
-Progress Indicator
-
-Control Bar (Next / Submit)
-```
+### The Indigo Theme
+The application has been synchronized with a premium **Indigo Accent** theme.
+- **Glassmorphism**: High-blur panels with subtle `white/5` borders.
+- **High Contrast**: Optimized accessibility for dark-theme result pages and light-theme management rooms.
+- **Micro-interactions**: Uses `framer-motion` for page transitions and interactive hover states.
 
 ---
 
-## 9. Component Mapping
+## 9. Interview Session Mechanics
 
-### Shared UI
-
-* `Button` – primary / secondary / ghost
-* `Card` – neutral surfaces
-* `GlassPanel` – emphasis surfaces
-
-### Layout
-
-* `AppLayout`
-* `Sidebar`
-* `TopBar`
-
-### Interview
-
-* `InterviewSession`
-* `InterviewHeader`
-* `QuestionPanel`
-* `ProgressIndicator`
-* `ControlBar`
-
-### Dashboards
-
-* `Dashboard` (generic base)
-* `AdminDashboard` (pending)
-* `HRDashboard` (pending)
+The interview room is a focus-oriented environment featuring:
+1. **Audio Integrity Check**: Verifies microphone presence before starting.
+2. **Dynamic Questioning**: Injects a mix of AI-generated and Bank-saved questions.
+3. **Automated Submission**: Audio blobs are sent to Cloudinary, then analyzed by **Gemini 2.5 Flash** for native audio-to-JSON scoring.
 
 ---
 
-## 10. State & Data Flow
+## 10. Role-Based Capabilities
 
-```
-AuthContext
-  ↓
-ProtectedRoute
-  ↓
-Page Component
-  ↓
-Hook (API call)
-  ↓
-Render UI
-```
+### Admin
+- **Global Visibility**: Full access to all departments and interviews.
+- **HR Management**: Create/Edit/Delete HR Manager accounts.
+- **Department Management**: Scale the organization structure.
 
----
+### HR Manager
+- **Department Isolation**: Can only manage candidates within their assigned department.
+- **Candidate Hub**: Bulk add candidates and track interview status.
+- **Question Customization**: Manage the departmental "Question Bank" to influence AI interviewer behavior.
 
-## 11. Deployment Notes (Frontend)
-
-* Deployed on **Vercel**
-* Requires `vercel.json` for SPA routing
-* Requires backend with:
-
-  * CORS enabled
-  * `sameSite: 'None'` cookies
+### Candidate
+- **Zero Configuration**: Simply login and start the assessment.
+- **Instant Results**: Access the **Interview Report** immediately after AI analysis.
 
 ---
 
-## 12. Current Status
+## 11. Deployment & Optimization
 
-### Completed
-
-* Marketing website
-* App shell
-* Auth & routing logic
-* Interview session UI
-* Shared design system
-* Candidate Result page
-* HR Dashboard
-* Admin Dashboard & HR Manager
-* Candidate Management (Admin/HR)
-* Interview history details
-* Mobile Responsiveness & Layout Polish
-* Advanced animations (Micro-interactions)
-
-### Pending
-
-* None (Ready for Launch 🚀)
+- **Vercel Pipeline**: Fully optimized for `vite` deployment.
+- **SPA Routing**: Handled via `vercel.json` rewrites.
+- **Cookie Security**: Configured to work with `withCredentials: true` and `sameSite: "None"` for cross-domain auth reliability.
 
 ---
 
-## 13. Next Steps
-
-1. Final end-to-end testing
-2. Deployment to production environment
-3. Gather user feedback for V2
-
----
-
-> This README documents the **entire frontend architecture and design system** and is safe to share with developers, reviewers, or maintainers.
+> This README is kept in sync with the live frontend implementation.

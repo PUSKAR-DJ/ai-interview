@@ -84,7 +84,7 @@ Role information is embedded in the JWT payload and revalidated per request.
 
 ## 6. Data Models (Schemas)
 
-> **Note:** The current implementation uses a simplified model set. Legacy models such as `Job` and `Candidate` have been deprecated in favor of a unified `User` model (role-based).
+> **Note:** The current implementation uses a unified `User` model with roles and a specific `Question` bank for department-specific assessments.
 
 ### 6.1 User Model
 
@@ -117,8 +117,6 @@ Department {
 }
 ```
 
-> Departments currently store only the department name. Ownership/audit fields (e.g., `createdBy`) can be added later if multi-admin auditing is required.
-
 ---
 
 ### 6.3 Interview Model
@@ -129,8 +127,8 @@ Interview {
   departmentId: ObjectId,
   hrId: ObjectId (optional),
   status: 'IN_PROGRESS' | 'COMPLETED',
-  questions: [],
-  remarks: [],
+  questions: [], // Mixed AI and DB questions
+  messages: [],  // Full conversation transcript
   feedback: String,
   audioUrl: String,
   score: Number,
@@ -145,6 +143,20 @@ Interview {
 
 ---
 
+### 6.4 Question Model
+
+```js
+Question {
+  text: String,
+  departmentId: ObjectId,
+  difficulty: 'Easy' | 'Medium' | 'Hard',
+  createdBy: ObjectId,
+  createdAt
+}
+```
+
+---
+
 ## 7. Authentication & Authorization Flow
 
 ### 7.1 Login Flow
@@ -152,7 +164,7 @@ Interview {
 ```
 POST /api/auth/login
  → Validate credentials
- → Sign JWT { id, role }
+ → Sign JWT { id, role, departmentId }
  → Set httpOnly cookie (token)
 ```
 
@@ -166,80 +178,77 @@ sameSite: 'None'
 
 ---
 
-### 7.2 Profile Fetch (Critical Endpoint)
+### 7.2 Profile Fetch
 
 ```
 GET /api/auth/profile
  → JWT verified
- → Return role, departmentId, interviewStatus
+ → Return user data with populated department
 ```
-
-This endpoint drives **all frontend routing decisions**.
 
 ---
 
 ## 8. Backend Folder Structure (Current)
 
-```
+```text
 backend/
 ├── src/
 │   ├── app.js
-│   ├── server.js
 │   │
 │   ├── config/
-│   │   ├── db.js
-│   │   └── jwt.js
+│   │   └── db.js
+│   │
+│   ├── controllers/
+│   │   ├── adminController.js
+│   │   ├── authController.js
+│   │   ├── hrController.js
+│   │   ├── interviewController.js
+│   │   └── questionController.js
+│   │
+│   ├── middlewares/
+│   │   ├── authMiddleware.js
+│   │   ├── roleMiddleware.js
+│   │   ├── uploadMiddleware.js
+│   │   └── errorMiddleware.js
 │   │
 │   ├── models/
 │   │   ├── User.js
 │   │   ├── Department.js
-│   │   └── Interview.js
-│   │
-│   ├── middlewares/
-│   │   ├── auth.middleware.js
-│   │   ├── role.middleware.js
-│   │   └── error.middleware.js
-│   │
-│   ├── controllers/
-│   │   ├── auth.controller.js
-│   │   ├── admin.controller.js
-│   │   ├── hr.controller.js
-│   │   └── interview.controller.js
+│   │   ├── Interview.js
+│   │   └── Question.js
 │   │
 │   ├── routes/
-│   │   ├── auth.routes.js
-│   │   ├── admin.routes.js
-│   │   ├── hr.routes.js
-│   │   └── interview.routes.js
+│   │   ├── adminRoutes.js
+│   │   ├── authRoutes.js
+│   │   ├── hrRoutes.js
+│   │   ├── interviewRoutes.js
+│   │   └── questionRoutes.js
+│   │
+│   ├── services/
+│   │   └── geminiService.js   # AI Analysis & Question Generation
 │   │
 │   └── utils/
-│       └── logger.js
+│       └── csvParser.js
 │
+├── server.js                  # Entry Point
 ├── .env
 ├── package.json
 └── README.md
 ```
-
-> **Note:** Business logic is intentionally kept inside controllers for clarity and simplicity. A `services/` layer can be introduced later if complexity increases.
 
 ---
 
 ## 9. Middleware Responsibilities
 
 ### Auth Middleware
-
-* Verifies JWT
-* Attaches `req.user`
+* Verifies JWT from cookies
+* Populates `req.user` with department data
 
 ### Role Middleware
+* `isAdmin`, `isHR`, `isCandidate`
 
-* `isAdmin`
-* `isHR`
-* `isStudent`
-
-### Department Guard
-
-* Ensures HR only accesses their department
+### Upload Middleware
+* Handles multi-part file uploads (Audio) via Cloudinary
 
 ---
 
@@ -250,9 +259,9 @@ backend/
 | Method | Route     | Description                    |
 | ------ | --------- | ------------------------------ |
 | POST   | /register | Create user (Admin/HR/Student) |
-| POST   | /login    | Login & set cookie             |
-| POST   | /logout   | Clear cookie                   |
-| GET    | /profile  | Return role + interviewStatus  |
+| POST   | /login    | Login & set secure cookie      |
+| POST   | /logout   | Clear secure cookie            |
+| GET    | /profile  | Return authenticated user profile|
 
 ---
 
@@ -260,12 +269,11 @@ backend/
 
 | Method | Route           | Description                 |
 | ------ | --------------- | --------------------------- |
-| GET    | /overview       | Global stats                |
-| POST   | /departments    | Create department           |
-| GET    | /departments    | List departments            |
-| POST   | /users          | Create HR / Student         |
-| GET    | /users          | List users                  |
-| GET    | /interviews/:id | Candidate interview history |
+| GET    | /overview       | Global platform stats       |
+| GET    | /departments    | List all departments        |
+| POST   | /departments    | Create new department       |
+| GET    | /users          | List all internal users     |
+| PUT    | /users/:id      | Update HR/Staff details     |
 
 ---
 
@@ -273,89 +281,55 @@ backend/
 
 | Method | Route           | Description              |
 | ------ | --------------- | ------------------------ |
-| GET    | /overview       | Dept dashboard           |
-| POST   | /candidates     | Create candidate         |
 | GET    | /candidates     | List dept candidates     |
+| POST   | /candidates     | Create new candidate     |
+| PUT    | /candidates/:id | Update candidate data    |
 | DELETE | /candidates/:id | Remove candidate         |
-| GET    | /interviews/:id | Interview history (dept) |
 
 ---
 
 ### 10.4 Interview Routes (`/api/interview`)
 
-| Method | Route           | Description      |
-| ------ | ------- | ---------------- |
-| POST   | /start  | Start interview  |
-| POST   | /submit | Submit interview |
-| GET    | /me     | Candidate result |
+| Method | Route           | Description                     |
+| ------ | --------------- | ------------------------------- |
+| POST   | /generate-questions | Get dynamic AI+DB quiz set  |
+| POST   | /submit         | Process audio & AI Analysis     |
+| GET    | /me             | Candidate result & transcript   |
+| GET    | /candidate/:id  | HR/Admin view candidate report  |
+
+---
+
+### 10.5 Question Routes (`/api/questions`)
+
+| Method | Route           | Description                    |
+| ------ | --------------- | ------------------------------ |
+| GET    | /               | List questions (Dept-scoped for HR)|
+| POST   | /               | Add new technical question     |
+| PUT    | /:id            | Edit question details          |
+| DELETE | /:id            | Remove question from bank      |
 
 ---
 
 ## 11. Interview Lifecycle Enforcement
 
 ```
-NOT_STARTED
-  ↓ (POST /start)
-IN_PROGRESS
-  ↓ (POST /submit)
-COMPLETED
+NOT_STARTED 
+  → /generate-questions 
+  → IN_PROGRESS 
+  → /submit 
+  → COMPLETED
 ```
 
-Backend blocks:
-
-* Starting interview twice
-* Submitting without start
-* Accessing others' interviews
+AI analysis is triggered automatically upon submission, performing native audio analysis using **Gemini 2.5 Flash**.
 
 ---
 
-## 12. Error Handling Strategy
+## 12. Deployment
 
-* Central error middleware
-* Consistent JSON errors
-* 401 → Auth errors
-* 403 → Authorization errors
-* 404 → Resource not found
+* Powered by **Vercel** (Serverless Functions)
+* Database on **MongoDB Atlas**
+* Asset storage on **Cloudinary**
 
 ---
 
-## 13. Security Considerations
-
-* No JWT in localStorage
-* CORS restricted to frontend domain
-* Cookies marked `secure` + `sameSite=None`
-* Role + department enforced server-side
-
----
-
-## 14. Deployment Notes
-
-* Backend must be HTTPS
-* CORS origin must match frontend exactly (no trailing slash)
-* Preflight (`OPTIONS`) must be allowed
-
----
-
-## 15. Current Backend Status
-
-### Implemented
-
-* Auth & role enforcement (Admin / HR / Student)
-* Department-scoped HR access
-* Interview lifecycle enforcement (single interview per candidate)
-* Admin & HR APIs aligned with frontend routing logic
-
-### Cleaned / Deprecated
-
-* Legacy models such as `Job` and `Candidate` have been removed.
-* Unused services (`geminiService.js`, `cloudinaryService.js`) have been removed for simplicity.
-
-### Possible Future Enhancements
-
-* Introduce a `services/` layer if business logic grows
-* Add audit fields (e.g., `createdBy`) to Department
-* Refresh tokens & rate limiting
-
----
-
-> This README now reflects the **current backend implementation accurately**, without idealized layers that are not yet present.
+> This README is kept in sync with the live backend implementation.
