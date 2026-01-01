@@ -10,6 +10,14 @@ This platform streamlines the recruitment process by automating the first round 
 
 ---
 
+## 🎬 Platform Demo
+
+<div align="center">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/Kgs1wWabzQI?si=T25twE9_AAsy7wHf" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
+---
+
 ## ✨ Key Features
 
 ### 🏢 For HR & Admins
@@ -112,11 +120,21 @@ npm run dev
 ```bash
 cd frontend
 npm install
-npm run dev
+
+```
+Create a `.env` file in the `frontend` folder:
+
+```env
+VITE_API_BASE_URL=<YOUR_BACKEND_URL>/api
 
 ```
 
----
+Start the client:
+
+```bash
+npm run dev
+
+```
 
 ## 📂 Project Structure
 
@@ -151,3 +169,4 @@ We utilize a specific prompt structure to ensure consistent JSON output from Gem
 * [Subhadip Mandal](https://github.com/Subhadip1001)
 * [Pronay Sarkar](https://github.com/PronaySarkar)
 * [Puskar Saha](https://github.com/PUSKAR-DJ)
+
