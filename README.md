@@ -134,18 +134,6 @@ VITE_API_BASE_URL=<YOUR_BACKEND_URL>/api
 Start the client:
 
 ```bash
-
-```
-Create a `.env` file in the `frontend` folder:
-
-```env
-VITE_API_BASE_URL=<YOUR_BACKEND_URL>/api
-
-```
-
-Start the client:
-
-```bash
 npm run dev
 
 ```
