@@ -10,6 +10,16 @@ This platform streamlines the recruitment process by automating the first round 
 
 ---
 
+## 🎬 Platform Demo
+
+<div align="center">
+    <a href="https://youtu.be/Kgs1wWabzQI?si=6vScpqDm2a5dGaFY" target="_blank">
+        <img src="https://img.youtube.com/vi/Kgs1wWabzQI/maxresdefault.jpg" alt="AI Interview Platform Demo" width="600" style="border-radius: 10px;">
+    </a>
+</div>
+
+---
+
 ## ✨ Key Features
 
 ### 🏢 For HR & Admins
@@ -112,11 +122,21 @@ npm run dev
 ```bash
 cd frontend
 npm install
-npm run dev
+
+```
+Create a `.env` file in the `frontend` folder:
+
+```env
+VITE_API_BASE_URL=<YOUR_BACKEND_URL>/api
 
 ```
 
----
+Start the client:
+
+```bash
+npm run dev
+
+```
 
 ## 📂 Project Structure
 
@@ -151,3 +171,4 @@ We utilize a specific prompt structure to ensure consistent JSON output from Gem
 * [Subhadip Mandal](https://github.com/Subhadip1001)
 * [Pronay Sarkar](https://github.com/PronaySarkar)
 * [Puskar Saha](https://github.com/PUSKAR-DJ)
+
