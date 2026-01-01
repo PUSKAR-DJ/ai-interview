@@ -1,8 +1,16 @@
+// middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.token;
+
+  console.log("Cookies:", req.cookies);
+  console.log("Raw Cookie Header:", req.headers.cookie);
+
+  const token =
+    req.cookies?.token ||
+    req.headers.cookie?.split("token=")[1]?.split(";")[0];
+
   if (!token) return res.status(401).json({ error: "Not authenticated" });
 
   try {
