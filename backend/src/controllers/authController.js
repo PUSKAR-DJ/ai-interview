@@ -60,15 +60,3 @@ export const logout = (req, res) => {
   });
   return res.json({ message: "Logged out" });
 };
-
-export const profile = (req, res) => {
-  res.json({
-    message: "Access granted",
-    user: {
-      id: req.user._id,
-      role: req.user.role,
-      departmentId: req.user.departmentId,
-      interviewStatus: req.user.interviewStatus
-    }
-  });
-};
