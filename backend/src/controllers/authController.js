@@ -19,6 +19,7 @@ export const register = async (req, res) => {
     httpOnly: true,       // not accessible to JS (prevents XSS)
     secure: true,         // https only (required in production)
     sameSite: "None",   // CSRF protection CHANGED: 'strict' -> 'None' to allow cross-domain cookies
+    path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
   });
 
