@@ -134,6 +134,18 @@ VITE_API_BASE_URL=<YOUR_BACKEND_URL>/api
 Start the client:
 
 ```bash
+
+```
+Create a `.env` file in the `frontend` folder:
+
+```env
+VITE_API_BASE_URL=<YOUR_BACKEND_URL>/api
+
+```
+
+Start the client:
+
+```bash
 npm run dev
 
 ```
@@ -171,4 +183,5 @@ We utilize a specific prompt structure to ensure consistent JSON output from Gem
 * [Subhadip Mandal](https://github.com/Subhadip1001)
 * [Pronay Sarkar](https://github.com/PronaySarkar)
 * [Puskar Saha](https://github.com/PUSKAR-DJ)
+
 
