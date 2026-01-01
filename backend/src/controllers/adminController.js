@@ -9,7 +9,7 @@ export const getAdminOverview = async (req, res) => {
     const totalCandidates = await User.countDocuments({ role: "student" });
     const totalHRs = await User.countDocuments({ role: "hr" });
     const totalDepts = await Department.countDocuments();
-    const completedInterviews = await Interview.countDocuments({ status: "COMPLETED" });
+    const completedInterviews = await Interview.countDocuments({ status: "Completed" });
 
     res.json({ totalCandidates, totalHRs, totalDepts, completedInterviews });
   } catch (error) {
@@ -98,6 +98,7 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
+    await Interview.findOneAndDelete({ candidateId: userId });
     res.json({ message: "User deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });

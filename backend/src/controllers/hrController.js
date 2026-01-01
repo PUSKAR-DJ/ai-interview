@@ -24,7 +24,7 @@ export const getDeptCandidates = async (req, res) => {
     const candidates = await User.find({
       role: "student",
       departmentId: req.user.departmentId
-    }).select("-password");
+    }).populate("departmentId", "name").select("-password");
     res.json(candidates);
   } catch (error) {
     res.status(500).json({ error: error.message });
