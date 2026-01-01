@@ -44,6 +44,7 @@ export const login = async (req, res) => {
     httpOnly: true,       // not accessible to JS (prevents XSS)
     secure: true,         // https only (required in production)
     sameSite: "None",   // CSRF protection CHANGED: 'strict' -> 'None' to allow cross-domain cookies
+    path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
   });
 
@@ -54,7 +55,8 @@ export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: true,
-    sameSite: "None"
+    sameSite: "None",
+    path: "/"
   });
   return res.json({ message: "Logged out" });
 };
